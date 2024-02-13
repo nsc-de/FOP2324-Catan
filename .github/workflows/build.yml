@@ -1,0 +1,80 @@
+name: Build Libs
+
+on:
+  push:
+    branches: "*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          submodules: recursive
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: "7.0.2"
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Build 🔨
+        run: ./gradlew mainBuildSubmission
+
+      - name: Find JAR file
+        run: |
+          # Use the find command to locate the JAR file
+          jar_path=$(find build/libs -name '*-submission.jar' -print -quit)
+
+          # Check if the JAR file is found
+          if [ -z "$jar_path" ]; then
+            echo "Error: JAR file not found."
+            exit 1
+          else
+            echo "Found JAR file: $jar_path"
+            echo JAR_PATH="$jar_path" >> $GITHUB_ENV
+          fi
+
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release 📦
+        id: create_release
+        uses: ncipollo/release-action@v1
+
+        with:
+          artifacts: |
+            build/libs/*-submission.jar
+          allowUpdates: false
+          makeLatest: true
+          name: ${{ steps.tag_version.outputs.new_tag }} - ${{ github.event.head_commit.message }} (${{ github.sha }})
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
