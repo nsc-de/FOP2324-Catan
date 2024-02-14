@@ -6,8 +6,11 @@ import projekt.model.HexGrid;
 import projekt.model.Intersection;
 import projekt.model.Player;
 import projekt.model.TilePosition;
+import projekt.model.tiles.Tile;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Default implementation of {@link Edge}.
@@ -49,15 +52,16 @@ public record EdgeImpl(
     @Override
     @StudentImplementationRequired("H1.3")
     public boolean connectsTo(final Edge other) {
-        // TODO: H1.3
-        return org.tudalgo.algoutils.student.Student.crash("H1.3 - Remove if implemented");
+        return getIntersections().stream().anyMatch(intersection -> other.getIntersections().stream().anyMatch(intersection1 -> intersection == intersection1));
     }
 
     @Override
     @StudentImplementationRequired("H1.3")
     public Set<Intersection> getIntersections() {
-        // TODO: H1.3
-        return org.tudalgo.algoutils.student.Student.crash("H1.3 - Remove if implemented");
+        HexGrid hexGrid = getHexGrid();
+        List<Tile> neighboringTiles = hexGrid.getTileAt(position1).getNeighbours()
+            .stream().filter(tile -> hexGrid.getTileAt(position2).getNeighbours().stream().anyMatch(tile2 -> tile2 == tile)).toList();
+        return Set.of(hexGrid.getIntersectionAt(position1, position2, neighboringTiles.get(0).getPosition()), hexGrid.getIntersectionAt(position1, position2, neighboringTiles.get(1).getPosition()));
     }
 
     @Override
@@ -68,7 +72,6 @@ public record EdgeImpl(
     @Override
     @StudentImplementationRequired("H1.3")
     public Set<Edge> getConnectedRoads(final Player player) {
-        // TODO: H1.3
-        return org.tudalgo.algoutils.student.Student.crash("H1.3 - Remove if implemented");
+        return getHexGrid().getRoads(player).values().stream().filter(edge -> edge.connectsTo(this)).collect(Collectors.toSet());
     }
 }
