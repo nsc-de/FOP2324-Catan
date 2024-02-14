@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 import projekt.Config;
+import projekt.model.buildings.Edge;
 import projekt.model.buildings.Settlement;
 
 import java.util.Collections;
@@ -127,7 +128,7 @@ public class PlayerImpl implements Player {
     public int getTradeRatio(final ResourceType resourceType) {
         Set<Settlement> settlements = getSettlements();
         if (settlements.stream().anyMatch((settlement -> settlement.intersection().getConnectedEdges().stream().anyMatch(edge -> edge.hasPort() && edge.getPort().resourceType() == resourceType)))) return 2;
-        if (settlements.stream().anyMatch((settlement -> settlement.intersection().getConnectedEdges().stream().anyMatch(edge -> edge.hasPort())))) return 3;
+        if (settlements.stream().anyMatch((settlement -> settlement.intersection().getConnectedEdges().stream().anyMatch(Edge::hasPort)))) return 3;
         else return 2;
     }
 
