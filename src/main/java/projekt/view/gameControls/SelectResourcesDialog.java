@@ -7,6 +7,7 @@ import javafx.scene.layout.Region;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 import projekt.model.Player;
 import projekt.model.ResourceType;
+import projekt.view.ResourceCardPane;
 
 import java.util.Map;
 
@@ -45,7 +46,11 @@ public class SelectResourcesDialog extends Dialog<Map<ResourceType, Integer>> {
         final int amountToSelect, final Player player,
         Map<ResourceType, Integer> resourcesToSelectFrom, final boolean dropCards
     ) {
-        // TODO: H3.3
-        return org.tudalgo.algoutils.student.Student.crash("H3.3 - Remove if implemented");
+        Dialog<Map<ResourceType, Integer>> dialog = new Dialog<>();
+        dialog.setTitle("Select resources");
+        dialog.getDialogPane().getChildren().add(new ResourceCardPane(ResourceType.CLAY, 10));
+
+        return dialog.getDialogPane();
+
     }
 }
