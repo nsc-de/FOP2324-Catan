@@ -134,16 +134,15 @@ public class PlayerActionsController implements Controller {
 
         Set<Class<? extends PlayerAction>> actions = objective.getAllowedActions();
         if (actions.contains(AcceptTradeAction.class)) acceptTradeOffer();
-        if (actions.contains(BuildRoadAction.class)) updateBuildRoadButtonState();
-        if (actions.contains(BuildVillageAction.class)) updateBuildVillageButtonState();
-        if (actions.contains(BuyDevelopmentCardAction.class)) updateBuyDevelopmentCardButtonState();
-        if (actions.contains(PlayDevelopmentCardAction.class)) updateUseDevelopmentCardButtonState();
-        if (actions.contains(SelectCardsAction.class)) selectCardToStealAction(); // Is that correct?
-        // if (actions.contains(SelectRobberTileAction.class))
-        // if (actions.contains(StealCardAction.class))
-        // if (actions.contains(TradeAction.class))
-        // if (actions.contains(UpgradeVillageAction.class))
-        // TODO: Implement missing action functions ^^
+        updateBuildRoadButtonState();
+        updateBuildVillageButtonState();
+        updateBuyDevelopmentCardButtonState();
+        updateUseDevelopmentCardButtonState();
+        if (actions.contains(SelectCardsAction.class)) selectResources(getPlayerState().cardsToSelect());
+        if (actions.contains(SelectRobberTileAction.class)) getHexGridController().highlightTiles(this::selectRobberTileAction);
+        if (actions.contains(StealCardAction.class)) selectCardToStealAction();
+        if (actions.contains(TradeAction.class)) getPlayerController().triggerAction(new TradeAction(getPlayerState().offeredTrade()));
+        updateUpgradeVillageButtonState();
     }
 
     /**
