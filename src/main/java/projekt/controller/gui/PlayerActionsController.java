@@ -28,6 +28,7 @@ import projekt.view.gameControls.UseDevelopmentCardDialog;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -119,8 +120,30 @@ public class PlayerActionsController implements Controller {
      */
     @StudentImplementationRequired("H3.2")
     private void updateUIBasedOnObjective(final PlayerObjective objective) {
-        // TODO: H3.2
-        org.tudalgo.algoutils.student.Student.crash("H3.2 - Remove if implemented");
+        removeAllHighlights();
+        drawEdges();
+        drawIntersections();
+        getHexGridController().drawTiles();
+
+        builder.disableAllButtons();
+        if (getPlayer().isAi()) return;
+
+        builder.enableRollDiceButton();
+        builder.enableTradeButton();
+        builder.enableEndTurnButton();
+
+        Set<Class<? extends PlayerAction>> actions = objective.getAllowedActions();
+        if (actions.contains(AcceptTradeAction.class)) acceptTradeOffer();
+        if (actions.contains(BuildRoadAction.class)) updateBuildRoadButtonState();
+        if (actions.contains(BuildVillageAction.class)) updateBuildVillageButtonState();
+        if (actions.contains(BuyDevelopmentCardAction.class)) updateBuyDevelopmentCardButtonState();
+        if (actions.contains(PlayDevelopmentCardAction.class)) updateUseDevelopmentCardButtonState();
+        if (actions.contains(SelectCardsAction.class)) selectCardToStealAction(); // Is that correct?
+        // if (actions.contains(SelectRobberTileAction.class))
+        // if (actions.contains(StealCardAction.class))
+        // if (actions.contains(TradeAction.class))
+        // if (actions.contains(UpgradeVillageAction.class))
+        // TODO: Implement missing action functions ^^
     }
 
     /**
