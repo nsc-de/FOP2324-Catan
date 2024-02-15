@@ -366,29 +366,10 @@ public class GameController {
      */
     @StudentImplementationRequired("H2.2")
     public void distributeResources(final int diceRoll) {
-        this.state
-            .getGrid()
-            .getTiles()
-            .values()
-            .stream()
-            .filter(tile -> tile.getRollNumber() == diceRoll)
-            .flatMap(tile -> tile.getIntersections()
-                .stream()
-                .filter(Intersection::hasSettlement)
-                .map(intersection -> new Pair<>(tile, intersection))
-            )
-            .forEach(intersection -> {
-                Settlement settlement = intersection.getValue().getSettlement();
-                Player player = settlement.owner();
-                ResourceType resource = intersection.getKey().getType().resourceType;
-                int amount = settlement.type() == Settlement.Type.CITY
-                    ? Config.RESOURCES_GAINED_BY_CITY
-                    : Config.RESOURCES_GAINED_BY_VILLAGE;
-
-                player.addResource(resource, amount);
-            });
-
-
-
+        getState().getGrid().getTiles().values().stream().filter(tile -> tile.getRollNumber() == diceRoll)
+            .forEach(tile -> tile.getIntersections().forEach(intersection -> {
+                if (intersection.hasSettlement())
+                    intersection.getSettlement().owner().addResource(tile.getType().resourceType, intersection.getSettlement().type().resourceAmount);
+            }));
     }
 }
