@@ -286,7 +286,7 @@ public class PlayerActionsController implements Controller {
     private void buildVillageButtonAction(final ActionEvent event) {
         getHexGridController().getIntersectionControllers().stream()
             .filter(intersectionController -> getPlayerState().buildableVillageIntersections().contains(intersectionController.getIntersection()))
-            .forEach(intersectionController -> intersectionController.highlight(mouseEvent -> getPlayerController().triggerAction(new BuildVillageAction(intersectionController.getIntersection()))));
+            .forEach(intersectionController -> intersectionController.highlight(buildActionWrapper(mouseEvent -> getPlayerController().triggerAction(new BuildVillageAction(intersectionController.getIntersection())))));
         removeAllHighlights();
     }
 
@@ -317,7 +317,7 @@ public class PlayerActionsController implements Controller {
     private void upgradeVillageButtonAction(final ActionEvent event) {
         getHexGridController().getIntersectionControllers().stream()
             .filter(intersectionController -> getPlayerState().upgradableVillageIntersections().contains(intersectionController.getIntersection()))
-            .forEach(intersectionController -> intersectionController.highlight(mouseEvent -> getPlayerController().triggerAction(new UpgradeVillageAction(intersectionController.getIntersection()))));
+            .forEach(intersectionController -> intersectionController.highlight(buildActionWrapper(mouseEvent -> getPlayerController().triggerAction(new UpgradeVillageAction(intersectionController.getIntersection())))));
         removeAllHighlights();
     }
 
@@ -348,7 +348,7 @@ public class PlayerActionsController implements Controller {
     private void buildRoadButtonAction(final ActionEvent event) {
         getHexGridController().getEdgeControllers().stream()
             .filter(edgeController -> getPlayerState().buildableRoadEdges().contains(edgeController.getEdge()))
-            .forEach(edgeController -> edgeController.highlight(mouseEvent -> getPlayerController().triggerAction(new BuildRoadAction(edgeController.getEdge()))));
+            .forEach(edgeController -> edgeController.highlight(buildActionWrapper(mouseEvent -> getPlayerController().triggerAction(new BuildRoadAction(edgeController.getEdge())))));
         removeAllHighlights();
     }
 
