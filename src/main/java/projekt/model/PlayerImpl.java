@@ -166,36 +166,35 @@ public class PlayerImpl implements Player {
     @Override
     @StudentImplementationRequired("H1.2")
     public Map<DevelopmentCardType, Integer> getDevelopmentCards() {
-        // TODO: H1.2
-        return org.tudalgo.algoutils.student.Student.crash("H1.2 - Remove if implemented");
+        return Collections.unmodifiableMap(this.developmentCards);
     }
 
     @Override
     @StudentImplementationRequired("H1.2")
     public void addDevelopmentCard(final DevelopmentCardType developmentCardType) {
-        // TODO: H1.2
-        org.tudalgo.algoutils.student.Student.crash("H1.2 - Remove if implemented");
+        this.developmentCards.put(developmentCardType, this.developmentCards.getOrDefault(developmentCardType, 0) + 1);
     }
 
     @Override
     @StudentImplementationRequired("H1.2")
     public boolean removeDevelopmentCard(final DevelopmentCardType developmentCardType) {
-        // TODO: H1.2
-        return org.tudalgo.algoutils.student.Student.crash("H1.2 - Remove if implemented");
+        if (this.developmentCards.getOrDefault(developmentCardType, 0) == 0) {
+            return false;
+        }
+        this.developmentCards.put(developmentCardType, this.developmentCards.get(developmentCardType) - 1);
+        return true;
     }
 
     @Override
     @StudentImplementationRequired("H1.2")
     public int getTotalDevelopmentCards() {
-        // TODO: H1.2
-        return org.tudalgo.algoutils.student.Student.crash("H1.2 - Remove if implemented");
+        return this.developmentCards.values().stream().mapToInt(Integer::intValue).sum();
     }
 
     @Override
     @StudentImplementationRequired("H1.2")
     public int getKnightsPlayed() {
-        // TODO: H1.2
-        return org.tudalgo.algoutils.student.Student.crash("H1.2 - Remove if implemented");
+        return this.playedDevelopmentCards.getOrDefault(DevelopmentCardType.KNIGHT, 0);
     }
 
     /**
