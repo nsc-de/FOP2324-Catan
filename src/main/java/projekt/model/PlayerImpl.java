@@ -166,7 +166,6 @@ public class PlayerImpl implements Player {
     @StudentImplementationRequired("H1.2")
     public Map<DevelopmentCardType, Integer> getDevelopmentCards() {
         return Collections.unmodifiableMap(developmentCards);
-        return Collections.unmodifiableMap(this.developmentCards);
     }
 
     @Override
