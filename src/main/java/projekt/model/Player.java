@@ -79,6 +79,10 @@ public interface Player {
      */
     Map<ResourceType, Integer> getResources();
 
+    default int getResourceSum() {
+        return getResources().values().stream().mapToInt(Integer::intValue).sum();
+    }
+
     /**
      * Adds the given amount of the given resource to the player.
      * Expects a positive amount.

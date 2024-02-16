@@ -7,6 +7,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 import projekt.Config;
+import projekt.controller.actions.EndTurnAction;
+import projekt.controller.actions.PlayerAction;
 import projekt.model.DevelopmentCardType;
 import projekt.model.GameState;
 import projekt.model.HexGridImpl;
@@ -286,8 +288,14 @@ public class GameController {
      */
     @StudentImplementationRequired("H2.1")
     private void regularTurn() {
-        // TODO: H2.1
-        org.tudalgo.algoutils.student.Student.crash("H2.1 - Remove if implemented");
+
+        while (true) {
+            PlayerAction action = activePlayerControllerProperty.getValue()
+                .waitForNextAction(PlayerObjective.REGULAR_TURN);
+            if (action instanceof EndTurnAction) break;
+
+        }
+
     }
 
     /**
@@ -297,8 +305,19 @@ public class GameController {
      */
     @StudentImplementationRequired("H2.1")
     private void firstRound() {
-        // TODO: H2.1
-        org.tudalgo.algoutils.student.Student.crash("H2.1 - Remove if implemented");
+        // Alle spieler platzieren 2 Dörfer und 2 Straßen
+        playerControllers.values().forEach(playerController -> {
+            withActivePlayer(playerController, () -> {
+                for (int i = 0; i < 2; i++) {
+
+                    // Place village
+                    playerController.waitForNextAction(PlayerObjective.PLACE_VILLAGE);
+
+                    // Place road
+                    playerController.waitForNextAction(PlayerObjective.PLACE_ROAD);
+                }
+            });
+        });
     }
 
     /**
@@ -327,8 +346,19 @@ public class GameController {
      */
     @StudentImplementationRequired("H2.1")
     private void diceRollSeven() {
-        // TODO: H2.1
-        org.tudalgo.algoutils.student.Student.crash("H2.1 - Remove if implemented");
+        playerControllers.keySet().forEach(player -> {
+            if (player.getResourceSum() > Config.RESOURCES_ALLOWED_NO_DROP) {
+                PlayerController activePlayerController = getActivePlayerController();
+                withActivePlayer(playerControllers.get(player), () -> {
+                    // Drop half of the cards
+                    playerControllers.get(player).waitForNextAction(PlayerObjective.DROP_CARDS);
+                });
+                setActivePlayerControllerProperty(activePlayerController.getPlayer());
+
+                activePlayerController.waitForNextAction(PlayerObjective.SELECT_ROBBER_TILE);
+                activePlayerController.waitForNextAction(PlayerObjective.SELECT_CARD_TO_STEAL);
+            }
+        });
     }
 
     /**
