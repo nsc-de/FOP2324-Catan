@@ -12,7 +12,6 @@ import projekt.controller.actions.EndTurnAction;
 import projekt.controller.actions.PlayerAction;
 import projekt.model.*;
 import projekt.model.buildings.Settlement;
-import projekt.model.tiles.Tile;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -332,20 +331,17 @@ public class GameController {
         final Player offeringPlayer, final Map<ResourceType, Integer> offer,
         final Map<ResourceType, Integer> request
     ) {
-        playerControllers.values().forEach(playerController -> {
-
-            // TODO: Terminate the loop if a player accepts the trade
+        for(PlayerController playerController : playerControllers.values()) {
+            if (playerController == offeringPlayer) continue;
             playerController.setPlayerObjective(PlayerObjective.ACCEPT_TRADE);
             playerController.setPlayerTradeOffer(offeringPlayer, offer, request);
-
-            PlayerController lastPlayerController = getActivePlayerController();
-            withActivePlayer(playerController, () -> {
-                // Accept trade
-                playerController.waitForNextAction(PlayerObjective.ACCEPT_TRADE);
-            });
-            setActivePlayerControllerProperty(lastPlayerController.getPlayer());
+            playerController.waitForNextAction();
             playerController.resetPlayerTradeOffer();
-        });
+
+            if(playerController.isTradeAccepted()) {
+                break;
+            }
+        }
     }
 
     /**

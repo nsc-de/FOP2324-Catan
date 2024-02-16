@@ -59,6 +59,8 @@ public class PlayerController {
 
     private Map<ResourceType, Integer> oldResources = new HashMap<>();
 
+    private boolean tradeAccepted = false;
+
     private int cardsToSelect = 0;
 
     /**
@@ -653,6 +655,9 @@ public class PlayerController {
      */
     @StudentImplementationRequired("H2.3")
     public void acceptTradeOffer(final boolean accepted) throws IllegalActionException {
+
+        tradeAccepted = false;
+
         if(tradingPlayer == null || playerTradingOffer == null || playerTradingRequest == null) {
             throw new IllegalActionException("No trade offer to accept");
         }
@@ -671,8 +676,11 @@ public class PlayerController {
             throw new IllegalActionException("Other player does not have the offered resources");
         }
 
-        // Trade can be executed
+        if(!canAcceptTradeOffer(tradingPlayer, playerTradingRequest)) {
+            throw new IllegalActionException("Player cannot accept the trade offer");
+        }
 
+        // Trade can be executed
 
         player.removeResources(playerTradingRequest);
         player.addResources(playerTradingOffer);
@@ -680,6 +688,7 @@ public class PlayerController {
         tradingPlayer.addResources(playerTradingRequest);
 
         setPlayerObjective(PlayerObjective.IDLE);
+        this.tradeAccepted = true;
 
     }
 
@@ -743,5 +752,9 @@ public class PlayerController {
             .filter(Predicate.not(player::equals))
             .filter(otherPlayer -> !otherPlayer.getResources().isEmpty())
             .collect(Collectors.toUnmodifiableList());
+    }
+
+    public boolean isTradeAccepted() {
+        return tradeAccepted;
     }
 }
