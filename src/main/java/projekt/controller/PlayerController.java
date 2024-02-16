@@ -413,8 +413,26 @@ public class PlayerController {
      */
     @StudentImplementationRequired("H2.6")
     public void upgradeVillage(final Intersection intersection) throws IllegalActionException {
-        // TODO: H2.6
-        org.tudalgo.algoutils.student.Student.crash("H2.6 - Remove if implemented");
+
+        if(intersection.getSettlement() == null) {
+            throw new IllegalActionException("No settlement at intersection");
+        }
+
+        if(intersection.getSettlement().type() != Settlement.Type.VILLAGE) {
+            throw new IllegalActionException("Intersection does not have a village");
+        }
+
+        if(intersection.getSettlement().owner() != player) {
+            throw new IllegalActionException("Intersection does not belong to player");
+        }
+
+        if (!canUpgradeVillage()) {
+            throw new IllegalActionException("Cannot upgrade village");
+        }
+
+        player.removeResources(Config.SETTLEMENT_BUILDING_COST.get(Settlement.Type.CITY));
+        intersection.upgradeSettlement(this.player);
+
     }
 
     /**
