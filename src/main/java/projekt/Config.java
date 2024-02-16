@@ -34,6 +34,8 @@ import static java.lang.Math.abs;
 public final class Config {
 
     public static final int RESOURCES_ALLOWED_NO_DROP = 7;
+    public static final int RESOURCES_GAINED_BY_VILLAGE = 1;
+    public static final int RESOURCES_GAINED_BY_CITY = 2;
 
     // Properties and global stuff
 

@@ -4,16 +4,15 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.util.Pair;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 import projekt.Config;
 import projekt.controller.actions.EndTurnAction;
 import projekt.controller.actions.PlayerAction;
-import projekt.model.DevelopmentCardType;
-import projekt.model.GameState;
-import projekt.model.HexGridImpl;
-import projekt.model.Player;
-import projekt.model.ResourceType;
+import projekt.model.*;
+import projekt.model.buildings.Settlement;
+import projekt.model.tiles.Tile;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -29,7 +28,7 @@ import java.util.stream.IntStream;
  * The GameController class represents the controller for the game logic.
  * It manages the game state, player controllers, dice rolling and the overall
  * progression of the game.
- * It tells the players controllers what to do and when to do it.
+ * It tells the player-controllers what to do and when to do it.
  */
 public class GameController {
 
@@ -368,7 +367,29 @@ public class GameController {
      */
     @StudentImplementationRequired("H2.2")
     public void distributeResources(final int diceRoll) {
-        // TODO: H2.2
-        org.tudalgo.algoutils.student.Student.crash("H2.2 - Remove if implemented");
+        this.state
+            .getGrid()
+            .getTiles()
+            .values()
+            .stream()
+            .filter(tile -> tile.getRollNumber() == diceRoll)
+            .flatMap(tile -> tile.getIntersections()
+                .stream()
+                .filter(Intersection::hasSettlement)
+                .map(intersection -> new Pair<>(tile, intersection))
+            )
+            .forEach(intersection -> {
+                Settlement settlement = intersection.getValue().getSettlement();
+                Player player = settlement.owner();
+                ResourceType resource = intersection.getKey().getType().resourceType;
+                int amount = settlement.type() == Settlement.Type.CITY
+                    ? Config.RESOURCES_GAINED_BY_CITY
+                    : Config.RESOURCES_GAINED_BY_VILLAGE;
+
+                player.addResource(resource, amount);
+            });
+
+
+
     }
 }
