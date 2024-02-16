@@ -78,7 +78,7 @@ public class PlayerImpl implements Player {
     @Override
     @StudentImplementationRequired("H1.1")
     public Map<ResourceType, Integer> getResources() {
-        return Collections.unmodifiableMap(this.resources);
+        return Collections.unmodifiableMap(resources);
     }
 
     @Override
@@ -139,7 +139,6 @@ public class PlayerImpl implements Player {
         if (settlements.stream().anyMatch((settlement -> settlement.intersection().getConnectedEdges().stream().anyMatch(edge -> edge.hasPort() && edge.getPort().resourceType() == resourceType)))) return 2;
         if (settlements.stream().anyMatch((settlement -> settlement.intersection().getConnectedEdges().stream().anyMatch(Edge::hasPort)))) return 3;
         return 4;
-
     }
 
     @Override
@@ -166,22 +165,23 @@ public class PlayerImpl implements Player {
     @Override
     @StudentImplementationRequired("H1.2")
     public Map<DevelopmentCardType, Integer> getDevelopmentCards() {
+        return Collections.unmodifiableMap(developmentCards);
         return Collections.unmodifiableMap(this.developmentCards);
     }
 
     @Override
     @StudentImplementationRequired("H1.2")
     public void addDevelopmentCard(final DevelopmentCardType developmentCardType) {
+        developmentCards.put(developmentCardType, developmentCards.getOrDefault(developmentCardType, 0));
         this.developmentCards.put(developmentCardType, this.developmentCards.getOrDefault(developmentCardType, 0) + 1);
     }
 
     @Override
     @StudentImplementationRequired("H1.2")
     public boolean removeDevelopmentCard(final DevelopmentCardType developmentCardType) {
-        if (this.developmentCards.getOrDefault(developmentCardType, 0) == 0) {
-            return false;
-        }
-        this.developmentCards.put(developmentCardType, this.developmentCards.get(developmentCardType) - 1);
+        if (developmentCards.getOrDefault(developmentCardType, 0) < 1) return false;
+        developmentCards.put(developmentCardType, developmentCards.get(developmentCardType) - 1);
+        playedDevelopmentCards.put(developmentCardType, playedDevelopmentCards.getOrDefault(developmentCardType, 0) + 1);
         return true;
     }
 
