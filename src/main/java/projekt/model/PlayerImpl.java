@@ -6,10 +6,13 @@ import org.jetbrains.annotations.Nullable;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 import projekt.Config;
+import projekt.model.buildings.Edge;
 import projekt.model.buildings.Settlement;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static projekt.Config.MAX_CITIES;
 import static projekt.Config.MAX_ROADS;
@@ -75,50 +78,68 @@ public class PlayerImpl implements Player {
     @Override
     @StudentImplementationRequired("H1.1")
     public Map<ResourceType, Integer> getResources() {
-        // TODO: H1.1
-        return org.tudalgo.algoutils.student.Student.crash("H1.1 - Remove if implemented");
+        return Collections.unmodifiableMap(this.resources);
     }
 
     @Override
     @StudentImplementationRequired("H1.1")
     public void addResource(final ResourceType resourceType, final int amount) {
-        // TODO: H1.1
-        org.tudalgo.algoutils.student.Student.crash("H1.1 - Remove if implemented");
+        // Da wir eine removeResource methode haben, gehe ich hier davon aus,
+        // dass amount nicht negativ sein kann
+        assert amount >= 0;
+        this.resources.put(resourceType, this.resources.getOrDefault(resourceType, 0) + amount);
     }
 
     @Override
     @StudentImplementationRequired("H1.1")
     public void addResources(final Map<ResourceType, Integer> resources) {
-        // TODO: H1.1
-        org.tudalgo.algoutils.student.Student.crash("H1.1 - Remove if implemented");
+        resources.forEach(this::addResource);
+    }
+
+    /**
+     * Check whether the player has enough of the given resource type.
+     * @param resourceType the resource type
+     * @param amount the amount
+     * @return whether the player has enough of the given resource type
+     */
+    private boolean hasResource(final ResourceType resourceType, final int amount) {
+        return this.resources.getOrDefault(resourceType, 0) >= amount;
     }
 
     @Override
     @StudentImplementationRequired("H1.1")
     public boolean hasResources(final Map<ResourceType, Integer> resources) {
-        // TODO: H1.1
-        return org.tudalgo.algoutils.student.Student.crash("H1.1 - Remove if implemented");
+        return resources.entrySet().stream().allMatch(entry -> hasResource(entry.getKey(), entry.getValue()));
     }
 
     @Override
     @StudentImplementationRequired("H1.1")
     public boolean removeResource(final ResourceType resourceType, final int amount) {
-        // TODO: H1.1
-        return org.tudalgo.algoutils.student.Student.crash("H1.1 - Remove if implemented");
+        if (!hasResource(resourceType, amount)) {
+            return false;
+        }
+        this.resources.put(resourceType, this.resources.get(resourceType) - amount);
+        return true;
     }
 
     @Override
     @StudentImplementationRequired("H1.1")
     public boolean removeResources(final Map<ResourceType, Integer> resources) {
-        // TODO: H1.1
-        return org.tudalgo.algoutils.student.Student.crash("H1.1 - Remove if implemented");
+        if(!hasResources(resources)){
+            return false;
+        }
+        resources.forEach(this::removeResource);
+        return true;
     }
 
     @Override
     @StudentImplementationRequired("H1.1")
     public int getTradeRatio(final ResourceType resourceType) {
-        // TODO: H1.1
-        return org.tudalgo.algoutils.student.Student.crash("H1.1 - Remove if implemented");
+        Set<Settlement> settlements = getSettlements();
+        if (settlements.stream().anyMatch((settlement -> settlement.intersection().getConnectedEdges().stream().anyMatch(edge -> edge.hasPort() && edge.getPort().resourceType() == resourceType)))) return 2;
+        if (settlements.stream().anyMatch((settlement -> settlement.intersection().getConnectedEdges().stream().anyMatch(Edge::hasPort)))) return 3;
+        return 4;
+
     }
 
     @Override
