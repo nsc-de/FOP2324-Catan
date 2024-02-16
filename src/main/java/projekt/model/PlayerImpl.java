@@ -130,7 +130,7 @@ public class PlayerImpl implements Player {
         Set<Settlement> settlements = getSettlements();
         if (settlements.stream().anyMatch((settlement -> settlement.intersection().getConnectedEdges().stream().anyMatch(edge -> edge.hasPort() && edge.getPort().resourceType() == resourceType)))) return 2;
         if (settlements.stream().anyMatch((settlement -> settlement.intersection().getConnectedEdges().stream().anyMatch(Edge::hasPort)))) return 3;
-        return 2;
+        return 4;
     }
 
     @Override
