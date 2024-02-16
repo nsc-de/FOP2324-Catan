@@ -332,8 +332,20 @@ public class GameController {
         final Player offeringPlayer, final Map<ResourceType, Integer> offer,
         final Map<ResourceType, Integer> request
     ) {
-        // TODO: H2.3
-        org.tudalgo.algoutils.student.Student.crash("H2.3 - Remove if implemented");
+        playerControllers.values().forEach(playerController -> {
+
+            // TODO: Terminate the loop if a player accepts the trade
+            playerController.setPlayerObjective(PlayerObjective.ACCEPT_TRADE);
+            playerController.setPlayerTradeOffer(offeringPlayer, offer, request);
+
+            PlayerController lastPlayerController = getActivePlayerController();
+            withActivePlayer(playerController, () -> {
+                // Accept trade
+                playerController.waitForNextAction(PlayerObjective.ACCEPT_TRADE);
+            });
+            setActivePlayerControllerProperty(lastPlayerController.getPlayer());
+            playerController.resetPlayerTradeOffer();
+        });
     }
 
     /**

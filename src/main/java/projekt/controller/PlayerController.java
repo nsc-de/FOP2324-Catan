@@ -560,8 +560,22 @@ public class PlayerController {
     @StudentImplementationRequired("H2.3")
     public void tradeWithBank(final ResourceType offerType, final int offerAmount, final ResourceType request)
     throws IllegalActionException {
-        // TODO: H2.3
-        org.tudalgo.algoutils.student.Student.crash("H2.3 - Remove if implemented");
+
+        if (!player.hasResources(Map.of(offerType, offerAmount))) {
+            throw new IllegalActionException("Player does not have the offered resources");
+        }
+
+        int tradeRatio = player.getTradeRatio(offerType);
+
+        // TODO: Wie false zurückgeben, return type ist void
+
+        if (offerAmount % tradeRatio != 0) {
+            throw new IllegalActionException("Offer amount is not a multiple of the trade ratio");
+        }
+
+        int receivedAmount = offerAmount / tradeRatio;
+        player.removeResource(offerType, offerAmount);
+
     }
 
     /**
@@ -639,8 +653,34 @@ public class PlayerController {
      */
     @StudentImplementationRequired("H2.3")
     public void acceptTradeOffer(final boolean accepted) throws IllegalActionException {
-        // TODO: H2.3
-        org.tudalgo.algoutils.student.Student.crash("H2.3 - Remove if implemented");
+        if(tradingPlayer == null || playerTradingOffer == null || playerTradingRequest == null) {
+            throw new IllegalActionException("No trade offer to accept");
+        }
+
+        if (!accepted) {
+            setPlayerObjective(PlayerObjective.IDLE);
+            return;
+        }
+
+        // We need to check whether the players have the required resources
+
+        if (!player.hasResources(playerTradingRequest)) {
+            throw new IllegalActionException("Player does not have the requested resources");
+        }
+        else if (!tradingPlayer.hasResources(playerTradingOffer)) {
+            throw new IllegalActionException("Other player does not have the offered resources");
+        }
+
+        // Trade can be executed
+
+
+        player.removeResources(playerTradingRequest);
+        player.addResources(playerTradingOffer);
+        tradingPlayer.removeResources(playerTradingOffer);
+        tradingPlayer.addResources(playerTradingRequest);
+
+        setPlayerObjective(PlayerObjective.IDLE);
+
     }
 
     // Robber methods
