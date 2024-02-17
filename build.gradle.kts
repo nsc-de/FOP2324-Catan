@@ -55,4 +55,12 @@ tasks {
             throw GradleException("Public tests will be released in the next few days.")
         }
     }
+
+    withType<JavaCompile> {
+        options.encoding = "UTF-8"
+    }
+
+    withType<Javadoc> {
+        options.encoding = "UTF-8"
+    }
 }
