@@ -137,11 +137,16 @@ public class PlayerActionsController implements Controller {
         updateBuildRoadButtonState();
         updateBuildVillageButtonState();
         updateBuyDevelopmentCardButtonState();
+        if (actions.contains(EndTurnAction.class)) builder.enableEndTurnButton();
+        else builder.disableEndTurnButton();
         updateUseDevelopmentCardButtonState();
+        if (actions.contains(RollDiceAction.class)) builder.enableRollDiceButton();
+        else builder.disableRollDiceButton();
         if (actions.contains(SelectCardsAction.class)) selectResources(getPlayerState().cardsToSelect());
         if (actions.contains(SelectRobberTileAction.class)) getHexGridController().highlightTiles(this::selectRobberTileAction);
         if (actions.contains(StealCardAction.class)) selectCardToStealAction();
-        if (actions.contains(TradeAction.class)) getPlayerController().triggerAction(new TradeAction(getPlayerState().offeredTrade()));
+        if (actions.contains(TradeAction.class)) builder.enableTradeButton();
+        else builder.disableTradeButton();
         updateUpgradeVillageButtonState();
     }
 
