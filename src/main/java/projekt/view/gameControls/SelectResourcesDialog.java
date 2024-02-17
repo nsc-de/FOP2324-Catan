@@ -1,15 +1,21 @@
 package projekt.view.gameControls;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
-import javafx.scene.layout.Region;
+import javafx.scene.control.Slider;
+import javafx.scene.layout.*;
+import javafx.scene.text.Text;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 import projekt.model.Player;
 import projekt.model.ResourceType;
 import projekt.view.ResourceCardPane;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * A dialog to prompt the user to select a number of resources.
@@ -46,11 +52,49 @@ public class SelectResourcesDialog extends Dialog<Map<ResourceType, Integer>> {
         final int amountToSelect, final Player player,
         Map<ResourceType, Integer> resourcesToSelectFrom, final boolean dropCards
     ) {
-        Dialog<Map<ResourceType, Integer>> dialog = new Dialog<>();
-        dialog.setTitle("Select resources");
-        dialog.getDialogPane().getChildren().add(new ResourceCardPane(ResourceType.CLAY, 10));
+        GridPane gridPane = new GridPane();
+        VBox vBox = new VBox();
+        gridPane.getChildren().add(vBox);
+        vBox.getChildren().add(new Text("Select resources"));
+        if (dropCards) vBox.getChildren().add(new Text("These resources will be dropped"));
+        HBox hBox = new HBox();
+        vBox.getChildren().add(hBox);
 
-        return dialog.getDialogPane();
+        Map<ResourceType, Integer> map = new HashMap<>();
 
+        if (resourcesToSelectFrom == null) resourcesToSelectFrom = player.getResources();
+
+        Text selected = new Text("Selected: 0 / " + amountToSelect);
+
+        resourcesToSelectFrom.forEach(((resourceType, amount) -> {
+            VBox localvBox = new VBox();
+            hBox.getChildren().add(localvBox);
+            localvBox.getChildren().add(new ResourceCardPane(resourceType, amount));
+            Slider slider = new Slider(0, amount, 0);
+            slider.setMajorTickUnit(2.0);
+            slider.setBlockIncrement(1.0);
+            slider.setShowTickLabels(true);
+            slider.setShowTickMarks(true);
+            Text sliderText = new Text("0");
+            slider.valueProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                    slider.setValue(newValue.intValue());
+                    map.put(resourceType, newValue.intValue());
+                    sliderText.setText(String.valueOf(newValue.intValue()));
+                    int mapSum = map.values().stream().mapToInt(Integer::intValue).sum();
+                    selected.setText("Selected: " + mapSum + " / " + amountToSelect);
+                    getDialogPane().lookupButton(ButtonType.OK).setDisable(mapSum != amountToSelect);
+                }
+            });
+            localvBox.getChildren().add(slider);
+            localvBox.getChildren().add(sliderText);
+        }));
+
+        vBox.getChildren().add(selected);
+
+        getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
+        setResultConverter(button -> map);
+        return gridPane;
     }
 }
