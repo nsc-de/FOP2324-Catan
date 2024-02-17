@@ -513,7 +513,7 @@ public class PlayerController {
             throw new IllegalActionException("Edge does not exist");
         }
 
-        boolean bordersSettlement = edge.getIntersections().stream().noneMatch(intersection -> intersection.playerHasSettlement(player));
+        boolean bordersSettlement = edge.getIntersections().stream().anyMatch(intersection -> intersection.playerHasSettlement(player));
 
         if(isFirstRound()) {
             // First round: check settlement connection
