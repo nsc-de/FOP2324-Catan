@@ -9,7 +9,6 @@ import projekt.controller.actions.IllegalActionException;
 import projekt.controller.actions.PlayerAction;
 import projekt.model.*;
 import projekt.model.buildings.Edge;
-import projekt.model.buildings.EdgeImpl;
 import projekt.model.buildings.Port;
 import projekt.model.buildings.Settlement;
 import projekt.model.tiles.Tile;
@@ -516,23 +515,33 @@ public class PlayerController {
             throw new IllegalActionException("Edge does not exist");
         }
 
+        boolean bordersSettlement = edge.getIntersections().stream().noneMatch(intersection -> intersection.playerHasSettlement(player));
+
         if(isFirstRound()) {
             // First round: check settlement connection
-            if(edge.getIntersections().stream().noneMatch(intersection -> intersection.playerHasSettlement(player))) {
+            if(!bordersSettlement) {
                 throw new IllegalActionException("No settlement at edge");
             }
         }
 
         // Check road connection (not first round)
-        else if(edge.getConnectedRoads(player).isEmpty()) {
-            throw new IllegalActionException("Edge already has a road");
+        else if(edge.getConnectedRoads(player).isEmpty() && !bordersSettlement) {
+            throw new IllegalActionException("Edge is not connected to player's buildings");
+        }
+
+        // Check if road connects to another player's settlements
+        if (edge.getIntersections().stream().anyMatch(intersection -> intersection.getSettlement().owner() != player)) {
+            throw new IllegalActionException("Cannot build road to another player's settlement");
+        }
+
+        if (edge.getRoadOwner() != null) {
+            throw new IllegalActionException("Cannot build road on existing road");
         }
 
         // Remove resources if not first round
         if (!isFirstRound()) {
             player.removeResources(Config.ROAD_BUILDING_COST);
         }
-
 
         edge.getRoadOwnerProperty().setValue(player);
     }
@@ -741,8 +750,8 @@ public class PlayerController {
             throw new IllegalActionException("Other player does not have the offered resources");
         }
 
-        if (!canAcceptTradeOffer(tradingPlayer, playerTradingRequest)) {
-            throw new IllegalActionException("Player cannot accept the trade offer");
+        if (player.equals(tradingPlayer)) {
+            throw new IllegalActionException("Player cannot trade with self");
         }
 
         // Trade can be executed
