@@ -528,7 +528,7 @@ public class PlayerController {
         }
 
         // Check if road connects to another player's settlements
-        if (edge.getIntersections().stream().anyMatch(intersection -> intersection.getSettlement().owner() != player)) {
+        if (edge.getIntersections().stream().anyMatch(intersection -> intersection.getSettlement() != null && intersection.getSettlement().owner() != player)) {
             throw new IllegalActionException("Cannot build road to another player's settlement");
         }
 
