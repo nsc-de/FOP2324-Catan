@@ -339,9 +339,8 @@ public class GameController {
             withActivePlayer(playerController, () -> {
                 if (playerController.getPlayer() == offeringPlayer) return;
 
-                playerController.setPlayerObjective(PlayerObjective.ACCEPT_TRADE);
                 playerController.setPlayerTradeOffer(offeringPlayer, offer, request);
-                PlayerAction action = playerController.waitForNextAction();
+                PlayerAction action = playerController.waitForNextAction(PlayerObjective.ACCEPT_TRADE);
                 playerController.resetPlayerTradeOffer();
 
                 if(action instanceof AcceptTradeAction && ((AcceptTradeAction) action).accepted()) {
