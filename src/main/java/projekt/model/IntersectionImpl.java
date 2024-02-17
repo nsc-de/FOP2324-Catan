@@ -85,15 +85,30 @@ public class IntersectionImpl implements Intersection {
     @Override
     @StudentImplementationRequired("H1.4")
     public boolean placeVillage(final Player player, final boolean ignoreRoadCheck) {
-        // TODO: H1.4
-        return org.tudalgo.algoutils.student.Student.crash("H1.4 - Remove if implemented");
+//        if(!ignoreRoadCheck && getConnectedEdges().stream().noneMatch(edge -> edge.hasRoad() && edge.getRoadOwner().equals(player))) {
+//            return false;
+//        }
+        if (!ignoreRoadCheck && !playerHasConnectedRoad(player)) {
+            return false;
+        }
+        if (hasSettlement()) {
+            return false;
+        }
+        settlement = new Settlement(player, Settlement.Type.VILLAGE, this);
+        return true;
     }
 
     @Override
     @StudentImplementationRequired("H1.4")
     public boolean upgradeSettlement(final Player player) {
-        // TODO: H1.4
-        return org.tudalgo.algoutils.student.Student.crash("H1.4 - Remove if implemented");
+        if (!playerHasSettlement(player)) {
+            return false;
+        }
+        if (settlement.type() == Settlement.Type.CITY) {
+            return false;
+        }
+        settlement = new Settlement(player, Settlement.Type.CITY, this);
+        return true;
     }
 
     @Override

@@ -226,8 +226,9 @@ public class HexGridImpl implements HexGrid {
     @Override
     @StudentImplementationRequired("H1.3")
     public Map<Set<TilePosition>, Edge> getRoads(final Player player) {
-        // TODO: H1.3
-        return org.tudalgo.algoutils.student.Student.crash("H1.3 - Remove if implemented");
+        return this.edges.entrySet().stream()
+            .filter(entry -> entry.getValue().getRoadOwner() == player && entry.getValue().hasRoad())
+            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @Override
@@ -242,8 +243,15 @@ public class HexGridImpl implements HexGrid {
         final TilePosition position0, final TilePosition position1, final Player player,
         final boolean checkVillages
     ) {
-        // TODO: H1.3
-        return org.tudalgo.algoutils.student.Student.crash("H1.3 - Remove if implemented");
+        if (checkVillages) {
+            final var intersection0 = intersections.get(Set.of(position0, position1, TilePosition.neighbour(position0, TilePosition.EdgeDirection.fromRelativePosition(position1))));
+            final var intersection1 = intersections.get(Set.of(position0, position1, TilePosition.neighbour(position1, TilePosition.EdgeDirection.fromRelativePosition(position0))));
+            if (intersection0.playerHasConnectedRoad(player) || intersection1.playerHasConnectedRoad(player)) {
+                return false;
+            }
+        }
+        edges.get(Set.of(position0, position1)).getRoadOwnerProperty().setValue(player);
+        return true;
     }
 
     @Override

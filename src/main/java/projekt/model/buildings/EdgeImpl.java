@@ -2,12 +2,13 @@ package projekt.model.buildings;
 
 import javafx.beans.property.Property;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
-import projekt.model.HexGrid;
-import projekt.model.Intersection;
-import projekt.model.Player;
-import projekt.model.TilePosition;
+import projekt.model.*;
+import projekt.model.tiles.Tile;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Default implementation of {@link Edge}.
@@ -49,15 +50,25 @@ public record EdgeImpl(
     @Override
     @StudentImplementationRequired("H1.3")
     public boolean connectsTo(final Edge other) {
-        // TODO: H1.3
-        return org.tudalgo.algoutils.student.Student.crash("H1.3 - Remove if implemented");
+        return getIntersections().stream().anyMatch(intersection -> other.getIntersections().contains(intersection));
     }
 
     @Override
     @StudentImplementationRequired("H1.3")
     public Set<Intersection> getIntersections() {
-        // TODO: H1.3
-        return org.tudalgo.algoutils.student.Student.crash("H1.3 - Remove if implemented");
+        HexGrid hexGrid = getHexGrid();
+        TilePosition.EdgeDirection edgeDirection = TilePosition.EdgeDirection.fromRelativePosition(TilePosition.subtract(position2, position1));
+        List<TilePosition> positions = List.of(position1, position2);
+        if (edgeDirection == edgeDirection.getLeftIntersection().leftDirection) {
+            return Set.of(hexGrid.getIntersectionAt(position1, positions.get(0), positions.get(1)));
+        }
+        if (edgeDirection == edgeDirection.getRightIntersection().rightDirection) {
+            return Set.of(hexGrid.getIntersectionAt(position2, positions.get(1), positions.get(0)));
+        }
+        return Set.of(
+            hexGrid.getIntersectionAt(position1, positions.get(0), positions.get(1)),
+            hexGrid.getIntersectionAt(position2, positions.get(1), positions.get(0))
+        );
     }
 
     @Override
@@ -68,7 +79,9 @@ public record EdgeImpl(
     @Override
     @StudentImplementationRequired("H1.3")
     public Set<Edge> getConnectedRoads(final Player player) {
-        // TODO: H1.3
-        return org.tudalgo.algoutils.student.Student.crash("H1.3 - Remove if implemented");
+        return getIntersections().stream()
+            .flatMap(intersection -> intersection.getConnectedEdges().stream())
+            .filter(edge -> edge.getRoadOwner() == player)
+            .collect(Collectors.toSet());
     }
 }

@@ -6,10 +6,15 @@ import org.jetbrains.annotations.Nullable;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 import projekt.Config;
+import projekt.model.buildings.Edge;
+import projekt.model.buildings.Port;
 import projekt.model.buildings.Settlement;
+import projekt.view.PortBuilder;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import static projekt.Config.MAX_CITIES;
 import static projekt.Config.MAX_ROADS;
@@ -75,50 +80,60 @@ public class PlayerImpl implements Player {
     @Override
     @StudentImplementationRequired("H1.1")
     public Map<ResourceType, Integer> getResources() {
-        // TODO: H1.1
-        return org.tudalgo.algoutils.student.Student.crash("H1.1 - Remove if implemented");
+       return Collections.unmodifiableMap(resources);
     }
 
     @Override
     @StudentImplementationRequired("H1.1")
     public void addResource(final ResourceType resourceType, final int amount) {
-        // TODO: H1.1
-        org.tudalgo.algoutils.student.Student.crash("H1.1 - Remove if implemented");
+        //this.resources.put(resourceType, resources.getOrDefault(resourceType, 0));
+        this.resources.put(resourceType, this.resources.getOrDefault(resourceType, 0) + amount);
     }
 
     @Override
     @StudentImplementationRequired("H1.1")
     public void addResources(final Map<ResourceType, Integer> resources) {
-        // TODO: H1.1
-        org.tudalgo.algoutils.student.Student.crash("H1.1 - Remove if implemented");
+        //resources.forEach((this::addResource));
+        resources.forEach((resourceType, amount) -> this.resources.put(resourceType, this.resources.getOrDefault(resourceType, 0) + amount));
     }
 
     @Override
     @StudentImplementationRequired("H1.1")
     public boolean hasResources(final Map<ResourceType, Integer> resources) {
-        // TODO: H1.1
-        return org.tudalgo.algoutils.student.Student.crash("H1.1 - Remove if implemented");
+        return this.resources.entrySet().stream().allMatch(entry -> this.resources.getOrDefault(entry.getKey(), 0) >= entry.getValue());
     }
 
     @Override
     @StudentImplementationRequired("H1.1")
     public boolean removeResource(final ResourceType resourceType, final int amount) {
-        // TODO: H1.1
-        return org.tudalgo.algoutils.student.Student.crash("H1.1 - Remove if implemented");
+        if (this.resources.getOrDefault(resourceType, 0) < amount) {
+            return false;
+        }
+        this.resources.put(resourceType, this.resources.get(resourceType) - amount);
+        return true;
     }
 
     @Override
     @StudentImplementationRequired("H1.1")
     public boolean removeResources(final Map<ResourceType, Integer> resources) {
-        // TODO: H1.1
-        return org.tudalgo.algoutils.student.Student.crash("H1.1 - Remove if implemented");
+        if (!hasResources(resources)) {
+            return false;
+        }
+        this.resources.forEach((resourceType, amount) ->
+            this.resources.put(resourceType, amount - resources.getOrDefault(resourceType, 0)));
+        return true;
     }
 
     @Override
     @StudentImplementationRequired("H1.1")
     public int getTradeRatio(final ResourceType resourceType) {
-        // TODO: H1.1
-        return org.tudalgo.algoutils.student.Student.crash("H1.1 - Remove if implemented");
+        //
+        Set<Settlement> settlements = getSettlements();
+        if (settlements.stream().anyMatch((settlement -> settlement.intersection().getConnectedEdges().stream().anyMatch(edge -> edge.hasPort() && edge.getPort().resourceType() == resourceType))))
+            return 2;
+        if (settlements.stream().anyMatch((settlement -> settlement.intersection().getConnectedEdges().stream().anyMatch(Edge::hasPort))))
+            return 3;
+        return 4;
     }
 
     @Override
@@ -145,36 +160,36 @@ public class PlayerImpl implements Player {
     @Override
     @StudentImplementationRequired("H1.2")
     public Map<DevelopmentCardType, Integer> getDevelopmentCards() {
-        // TODO: H1.2
-        return org.tudalgo.algoutils.student.Student.crash("H1.2 - Remove if implemented");
+        return Collections.unmodifiableMap(developmentCards);
     }
 
     @Override
     @StudentImplementationRequired("H1.2")
     public void addDevelopmentCard(final DevelopmentCardType developmentCardType) {
-        // TODO: H1.2
-        org.tudalgo.algoutils.student.Student.crash("H1.2 - Remove if implemented");
+        this.developmentCards.put(developmentCardType, developmentCards.getOrDefault(developmentCardType, 0) + 1);
     }
 
     @Override
     @StudentImplementationRequired("H1.2")
     public boolean removeDevelopmentCard(final DevelopmentCardType developmentCardType) {
-        // TODO: H1.2
-        return org.tudalgo.algoutils.student.Student.crash("H1.2 - Remove if implemented");
+        if (this.developmentCards.getOrDefault(developmentCardType, 0) < 1) {
+            return false;
+        }
+        this.developmentCards.put(developmentCardType, developmentCards.get(developmentCardType) - 1);
+        return true;
     }
 
     @Override
     @StudentImplementationRequired("H1.2")
     public int getTotalDevelopmentCards() {
-        // TODO: H1.2
-        return org.tudalgo.algoutils.student.Student.crash("H1.2 - Remove if implemented");
+        return this.developmentCards.values().stream().mapToInt(Integer::intValue).sum();
     }
 
     @Override
     @StudentImplementationRequired("H1.2")
     public int getKnightsPlayed() {
-        // TODO: H1.2
-        return org.tudalgo.algoutils.student.Student.crash("H1.2 - Remove if implemented");
+        return this.playedDevelopmentCards.getOrDefault(DevelopmentCardType.KNIGHT, 0);
+
     }
 
     /**
