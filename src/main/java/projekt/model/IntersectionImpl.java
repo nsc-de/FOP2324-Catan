@@ -85,15 +85,23 @@ public class IntersectionImpl implements Intersection {
     @Override
     @StudentImplementationRequired("H1.4")
     public boolean placeVillage(final Player player, final boolean ignoreRoadCheck) {
-        // TODO: H1.4
-        return org.tudalgo.algoutils.student.Student.crash("H1.4 - Remove if implemented");
+        if(!ignoreRoadCheck && !playerHasConnectedRoad(player)) return false;
+        if(hasSettlement()) return false;
+
+        // eigentlich müsste man hier noch testen, dass die nächste Siedlung mindestens 2 straßen entfernt ist
+        // aber das ist nicht gefordert und ich hab keine lust das zu implementieren
+
+        settlement = new Settlement(player, Settlement.Type.VILLAGE, this);
+        return true;
     }
 
     @Override
     @StudentImplementationRequired("H1.4")
     public boolean upgradeSettlement(final Player player) {
-        // TODO: H1.4
-        return org.tudalgo.algoutils.student.Student.crash("H1.4 - Remove if implemented");
+        if(!playerHasSettlement(player)) return false;
+        if(settlement.type() != Settlement.Type.VILLAGE) return false;
+        settlement = new Settlement(player, Settlement.Type.CITY, this);
+        return true;
     }
 
     @Override
