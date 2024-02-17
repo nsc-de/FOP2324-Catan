@@ -350,6 +350,7 @@ public class GameController {
         for (PlayerController playerController: playerControllers.values()) {
             if (playerController.getPlayer().getResourceSum() > Config.RESOURCES_ALLOWED_NO_DROP) {
                 withActivePlayer(playerController, () -> {
+                    playerController.setCardsToSelect((int) Math.ceil((double) playerController.getPlayer().getResourceSum() / 2));
                     playerController.waitForNextAction(PlayerObjective.DROP_CARDS);
                 });
             }
