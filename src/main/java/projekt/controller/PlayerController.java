@@ -637,15 +637,13 @@ public class PlayerController {
 
         int tradeRatio = player.getTradeRatio(offerType);
 
-        // TODO: Wie false zurückgeben, return type ist void
-
         if (offerAmount % tradeRatio != 0) {
             throw new IllegalActionException("Offer amount is not a multiple of the trade ratio");
         }
 
         int receivedAmount = offerAmount / tradeRatio;
         player.removeResource(offerType, offerAmount);
-
+        player.addResource(request, receivedAmount);
     }
 
     /**
