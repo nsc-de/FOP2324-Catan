@@ -6,9 +6,9 @@ import projekt.model.HexGrid;
 import projekt.model.Intersection;
 import projekt.model.Player;
 import projekt.model.TilePosition;
+import projekt.model.TilePosition.*;
 import projekt.model.tiles.Tile;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -62,13 +62,10 @@ public record EdgeImpl(
     @Override
     @StudentImplementationRequired("H1.3")
     public Set<Intersection> getIntersections() {
-        Set<Tile> pos1neighbours = grid.getTileAt(position1).getNeighbours();
-        Set<Tile> pos2neighbours = grid.getTileAt(position2).getNeighbours();
-        pos1neighbours.retainAll(pos2neighbours);
-        return pos1neighbours
-            .stream()
-            .map(tile -> grid.getIntersectionAt(position1, position2, tile.getPosition()))
-            .collect(Collectors.toSet());
+        assert grid.getTileAt(position1) != null;
+        EdgeDirection edgeDirection = EdgeDirection.fromRelativePosition(TilePosition.subtract(position2, position1));
+        Tile tile1 = grid.getTileAt(position1);
+        return Set.of(tile1.getIntersection(edgeDirection.getLeftIntersection()), tile1.getIntersection(edgeDirection.getRightIntersection()));
     }
 
     @Override
