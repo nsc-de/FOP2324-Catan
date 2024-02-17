@@ -8,6 +8,7 @@ import javafx.util.Pair;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 import projekt.Config;
+import projekt.controller.actions.AcceptTradeAction;
 import projekt.controller.actions.EndTurnAction;
 import projekt.controller.actions.PlayerAction;
 import projekt.model.*;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -332,16 +334,24 @@ public class GameController {
         final Map<ResourceType, Integer> request
     ) {
         for(PlayerController playerController : playerControllers.values()) {
-            if (playerController == offeringPlayer) continue;
-            playerController.setPlayerObjective(PlayerObjective.ACCEPT_TRADE);
-            playerController.setPlayerTradeOffer(offeringPlayer, offer, request);
-            playerController.waitForNextAction();
-            playerController.resetPlayerTradeOffer();
+            AtomicBoolean tradeAccepted = new AtomicBoolean(false);
 
-            if(playerController.isTradeAccepted()) {
-                break;
-            }
+            withActivePlayer(playerController, () -> {
+                if (playerController.getPlayer() == offeringPlayer) return;
+
+                playerController.setPlayerObjective(PlayerObjective.ACCEPT_TRADE);
+                playerController.setPlayerTradeOffer(offeringPlayer, offer, request);
+                PlayerAction action = playerController.waitForNextAction();
+                playerController.resetPlayerTradeOffer();
+
+                if(action instanceof AcceptTradeAction && ((AcceptTradeAction) action).accepted()) {
+                    tradeAccepted.set(true);
+                }
+            });
+
+            if (tradeAccepted.get()) break;
         }
+        setActivePlayerControllerProperty(offeringPlayer);
     }
 
     /**
