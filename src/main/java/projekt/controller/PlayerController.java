@@ -745,7 +745,7 @@ public class PlayerController {
         }
 
         if (player.equals(tradingPlayer)) {
-            throw new IllegalActionException("Player cannot trade with self");
+            throw new IllegalActionException("Player cannot trade with themself");
         }
 
         // Trade can be executed
