@@ -334,18 +334,18 @@ public class GameController {
         final Map<ResourceType, Integer> request
     ) {
         for(PlayerController playerController : playerControllers.values()) {
+
+            if (playerController == offeringPlayer) continue;
             AtomicBoolean tradeAccepted = new AtomicBoolean(false);
 
             withActivePlayer(playerController, () -> {
-                if (playerController.getPlayer() == offeringPlayer) return;
-
                 playerController.setPlayerTradeOffer(offeringPlayer, offer, request);
                 PlayerAction action = playerController.waitForNextAction(PlayerObjective.ACCEPT_TRADE);
                 playerController.resetPlayerTradeOffer();
 
-                if(action instanceof AcceptTradeAction && ((AcceptTradeAction) action).accepted()) {
+                if(action instanceof AcceptTradeAction && ((AcceptTradeAction) action).accepted())
                     tradeAccepted.set(true);
-                }
+
             });
 
             if (tradeAccepted.get()) break;
