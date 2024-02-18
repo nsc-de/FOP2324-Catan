@@ -288,14 +288,11 @@ public class GameController {
      */
     @StudentImplementationRequired("H2.1")
     private void regularTurn() {
-
-        while (true) {
-            PlayerAction action = activePlayerControllerProperty.getValue()
-                .waitForNextAction(PlayerObjective.REGULAR_TURN);
-            if (action instanceof EndTurnAction) break;
-
+        PlayerAction playerAction;
+        do {
+            playerAction = getActivePlayerController().waitForNextAction(PlayerObjective.REGULAR_TURN);
         }
-
+        while (!(playerAction instanceof EndTurnAction));
     }
 
     /**
@@ -305,19 +302,15 @@ public class GameController {
      */
     @StudentImplementationRequired("H2.1")
     private void firstRound() {
-        // Alle spieler platzieren 2 Dörfer und 2 Straßen
-        playerControllers.values().forEach(playerController -> {
+        // Alle Spieler platzieren 2 Dörfer und 2 Straßen
+        for (PlayerController playerController: playerControllers.values()) {
             withActivePlayer(playerController, () -> {
                 for (int i = 0; i < 2; i++) {
-
-                    // Place village
                     playerController.waitForNextAction(PlayerObjective.PLACE_VILLAGE);
-
-                    // Place road
                     playerController.waitForNextAction(PlayerObjective.PLACE_ROAD);
                 }
             });
-        });
+        }
     }
 
     /**
@@ -362,19 +355,18 @@ public class GameController {
      */
     @StudentImplementationRequired("H2.1")
     private void diceRollSeven() {
-        playerControllers.keySet().forEach(player -> {
-            if (player.getResourceSum() > Config.RESOURCES_ALLOWED_NO_DROP) {
-                PlayerController activePlayerController = getActivePlayerController();
-                withActivePlayer(playerControllers.get(player), () -> {
-                    // Drop half of the cards
-                    playerControllers.get(player).waitForNextAction(PlayerObjective.DROP_CARDS);
+        PlayerController currentPC = getActivePlayerController();
+        for (PlayerController playerController: playerControllers.values()) {
+            if (playerController.getPlayer().getResourceSum() > Config.RESOURCES_ALLOWED_NO_DROP) {
+                withActivePlayer(playerController, () -> {
+                    playerController.setCardsToSelect((int) Math.ceil((double) playerController.getPlayer().getResourceSum() / 2));
+                    playerController.waitForNextAction(PlayerObjective.DROP_CARDS);
                 });
-                setActivePlayerControllerProperty(activePlayerController.getPlayer());
-
-                activePlayerController.waitForNextAction(PlayerObjective.SELECT_ROBBER_TILE);
-                activePlayerController.waitForNextAction(PlayerObjective.SELECT_CARD_TO_STEAL);
             }
-        });
+        }
+        setActivePlayerControllerProperty(currentPC.getPlayer());
+        currentPC.waitForNextAction(PlayerObjective.SELECT_ROBBER_TILE);
+        currentPC.waitForNextAction(PlayerObjective.SELECT_CARD_TO_STEAL);
     }
 
     /**
@@ -384,29 +376,10 @@ public class GameController {
      */
     @StudentImplementationRequired("H2.2")
     public void distributeResources(final int diceRoll) {
-        this.state
-            .getGrid()
-            .getTiles()
-            .values()
-            .stream()
-            .filter(tile -> tile.getRollNumber() == diceRoll)
-            .flatMap(tile -> tile.getIntersections()
-                .stream()
-                .filter(Intersection::hasSettlement)
-                .map(intersection -> new Pair<>(tile, intersection))
-            )
-            .forEach(intersection -> {
-                Settlement settlement = intersection.getValue().getSettlement();
-                Player player = settlement.owner();
-                ResourceType resource = intersection.getKey().getType().resourceType;
-                int amount = settlement.type() == Settlement.Type.CITY
-                    ? Config.RESOURCES_GAINED_BY_CITY
-                    : Config.RESOURCES_GAINED_BY_VILLAGE;
-
-                player.addResource(resource, amount);
-            });
-
-
-
+        getState().getGrid().getTiles().values().stream().filter(tile -> tile.getRollNumber() == diceRoll)
+            .forEach(tile -> tile.getIntersections().forEach(intersection -> {
+                if (intersection.hasSettlement())
+                    intersection.getSettlement().owner().addResource(tile.getType().resourceType, intersection.getSettlement().type().resourceAmount);
+            }));
     }
 }
