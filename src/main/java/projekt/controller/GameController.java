@@ -376,10 +376,19 @@ public class GameController {
      */
     @StudentImplementationRequired("H2.2")
     public void distributeResources(final int diceRoll) {
-        getState().getGrid().getTiles().values().stream().filter(tile -> tile.getRollNumber() == diceRoll)
-            .forEach(tile -> tile.getIntersections().forEach(intersection -> {
-                if (intersection.hasSettlement())
-                    intersection.getSettlement().owner().addResource(tile.getType().resourceType, intersection.getSettlement().type().resourceAmount);
-            }));
+        getState()
+            .getGrid()
+            .getTiles()
+            .values()
+            .stream()
+            .filter(tile -> tile.getRollNumber() == diceRoll)
+            .forEach(tile -> {
+                tile.getIntersections().forEach(intersection -> {
+                    if (intersection.hasSettlement())
+                        intersection.getSettlement()
+                            .owner()
+                            .addResource(tile.getType().resourceType, intersection.getSettlement().type().resourceAmount);
+                });
+            });
     }
 }

@@ -813,8 +813,16 @@ public class PlayerController {
      * @return all players that are next to the robber and not the current player.
      */
     public List<Player> getPlayersToStealFrom() {
-        return gameController.getState().getGrid().getTileAt(gameController.getState().getGrid().getRobberPosition())
-            .getIntersections().stream()
+        return gameController.getState().
+            getGrid()
+            .getTileAt(
+                gameController
+                    .getState()
+                    .getGrid()
+                    .getRobberPosition()
+            )
+            .getIntersections()
+            .stream()
             .filter(Intersection::hasSettlement)
             .map(i -> i.getSettlement().owner())
             .filter(Predicate.not(player::equals))
