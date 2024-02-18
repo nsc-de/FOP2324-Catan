@@ -10,3 +10,5 @@ Beachten Sie die Hinweise zum Herunterladen, Importieren, Bearbeitern, Exportier
 [Download Worksheet](https://raw.githubusercontent.com/FOP-2324/FOP-2324-TeX/master/FOP-2324-Projekt.pdf)
 ·
 [Get Solution (When available)](https://github.com/FOP-2324/FOP-2324-Projekt-Root)
+·
+[See Javadoc](https://nscde.com/FOP2324-Catan/)
