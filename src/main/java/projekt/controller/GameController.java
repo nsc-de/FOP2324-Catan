@@ -387,7 +387,10 @@ public class GameController {
                     if (intersection.hasSettlement())
                         intersection.getSettlement()
                             .owner()
-                            .addResource(tile.getType().resourceType, intersection.getSettlement().type().resourceAmount);
+                            .addResource(
+                                tile.getType().resourceType,
+                                intersection.getSettlement().type().resourceAmount
+                            );
                 });
             });
     }
