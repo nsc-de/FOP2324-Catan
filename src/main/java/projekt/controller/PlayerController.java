@@ -468,7 +468,7 @@ public class PlayerController {
      */
     @StudentImplementationRequired("H2.5")
     public boolean canBuildRoad() {
-        if (isFirstRound()/* && player.getRemainingRoads() >= Config.MAX_ROADS - 2*/) {
+        if (isFirstRound()) {
             return true;
         }
         return player.hasResources(Config.ROAD_BUILDING_COST);
