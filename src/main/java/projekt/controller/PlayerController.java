@@ -513,17 +513,15 @@ public class PlayerController {
             throw new IllegalActionException("Edge does not exist");
         }
 
-        boolean bordersSettlement = edge.getIntersections().stream().anyMatch(intersection -> intersection.playerHasSettlement(player));
-
         if(isFirstRound()) {
             // First round: check settlement connection
-            if(!bordersSettlement) {
+            if(edge.getIntersections().stream().noneMatch(intersection -> intersection.playerHasSettlement(player))) {
                 throw new IllegalActionException("No settlement at edge");
             }
         }
 
         // Check road connection (not first round)
-        else if(edge.getConnectedRoads(player).isEmpty() && !bordersSettlement) {
+        else if(edge.getConnectedRoads(player).isEmpty()) {
             throw new IllegalActionException("Edge is not connected to player's buildings");
         }
 
