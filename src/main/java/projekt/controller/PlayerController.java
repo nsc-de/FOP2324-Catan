@@ -328,7 +328,7 @@ public class PlayerController {
      */
     @StudentImplementationRequired("H2.5")
     public boolean canBuildVillage() {
-        if (isFirstRound()/* && player.getRemainingVillages() >= Config.MAX_VILLAGES - 2*/) {
+        if (isFirstRound()) {
             return true;
         }
 
