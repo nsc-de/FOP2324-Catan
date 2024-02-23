@@ -330,8 +330,9 @@ public class GameController {
             AtomicBoolean tradeAccepted = new AtomicBoolean(false);
 
             withActivePlayer(playerController, () -> {
+                playerController.setPlayerObjective(PlayerObjective.ACCEPT_TRADE);
                 playerController.setPlayerTradeOffer(offeringPlayer, offer, request);
-                PlayerAction action = playerController.waitForNextAction(PlayerObjective.ACCEPT_TRADE);
+                PlayerAction action = playerController.waitForNextAction();
                 playerController.resetPlayerTradeOffer();
 
                 if(action instanceof AcceptTradeAction && ((AcceptTradeAction) action).accepted())

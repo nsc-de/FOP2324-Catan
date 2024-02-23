@@ -623,14 +623,15 @@ public class PlayerController {
     public void tradeWithBank(final ResourceType offerType, final int offerAmount, final ResourceType request)
         throws IllegalActionException {
 
-        if (!player.hasResources(Map.of(offerType, offerAmount))) {
-            throw new IllegalActionException("Player does not have the offered resources");
-        }
-
         int tradeRatio = player.getTradeRatio(offerType);
 
         if (offerAmount % tradeRatio != 0) {
             throw new IllegalActionException("Offer amount is not a multiple of the trade ratio");
+        }
+
+
+        if (!player.hasResources(Map.of(offerType, offerAmount))) {
+            throw new IllegalActionException("Player does not have the offered resources");
         }
 
         int receivedAmount = offerAmount / tradeRatio;
@@ -731,9 +732,9 @@ public class PlayerController {
             throw new IllegalActionException("Other player does not have the offered resources");
         }
 
-        if (player.equals(tradingPlayer)) {
-            throw new IllegalActionException("Player cannot trade with themself");
-        }
+        //if (player.equals(tradingPlayer)) {
+        //    throw new IllegalActionException("Player cannot trade with themself");
+        //}
 
         // Trade can be executed
 
