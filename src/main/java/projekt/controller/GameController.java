@@ -4,7 +4,6 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.util.Pair;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 import projekt.Config;
@@ -12,7 +11,6 @@ import projekt.controller.actions.AcceptTradeAction;
 import projekt.controller.actions.EndTurnAction;
 import projekt.controller.actions.PlayerAction;
 import projekt.model.*;
-import projekt.model.buildings.Settlement;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -328,7 +326,7 @@ public class GameController {
     ) {
         for(PlayerController playerController : playerControllers.values()) {
 
-            if (playerController == offeringPlayer) continue;
+            if (playerController.getPlayer() == offeringPlayer) continue;
             AtomicBoolean tradeAccepted = new AtomicBoolean(false);
 
             withActivePlayer(playerController, () -> {
