@@ -328,16 +328,8 @@ public class PlayerController {
      */
     @StudentImplementationRequired("H2.5")
     public boolean canBuildVillage() {
-        if (isFirstRound()) {
-            return true;
-        }
-
-//      Not asked
-//      if(player.getRemainingVillages() == 0) {
-//          return false;
-//      }
-
-        return player.hasResources(Config.SETTLEMENT_BUILDING_COST.get(Settlement.Type.VILLAGE));
+        return (playerObjectiveProperty.getValue() == PlayerObjective.PLACE_VILLAGE || player.hasResources(Config.SETTLEMENT_BUILDING_COST.get(Settlement.Type.VILLAGE)))
+                && player.getRemainingVillages() > 0;
     }
 
     /**
@@ -356,19 +348,16 @@ public class PlayerController {
             throw new IllegalActionException("Cannot build village");
         }
 
-        Set<Settlement> settlements = player.getSettlements();
-
         if (intersection.hasSettlement()) {
             throw new IllegalActionException("Intersection already has a settlement");
         }
 
-        if (!isFirstRound()) {
-            player.removeResources(Config.SETTLEMENT_BUILDING_COST.get(Settlement.Type.VILLAGE));
-        }
-
-        if (!intersection.placeVillage(player, settlements.size() < 2))
+        if (!intersection.placeVillage(player, isFirstRound()))
             throw new IllegalActionException("Cannot build village");
 
+        if (playerObjectiveProperty.getValue() != PlayerObjective.PLACE_VILLAGE) {
+            player.removeResources(Config.SETTLEMENT_BUILDING_COST.get(Settlement.Type.VILLAGE));
+        }
     }
 
     /**
@@ -468,10 +457,8 @@ public class PlayerController {
      */
     @StudentImplementationRequired("H2.5")
     public boolean canBuildRoad() {
-        if (isFirstRound()) {
-            return true;
-        }
-        return player.hasResources(Config.ROAD_BUILDING_COST);
+        return (playerObjectiveProperty.getValue() == PlayerObjective.PLACE_ROAD || player.hasResources(Config.ROAD_BUILDING_COST))
+            && player.getRemainingRoads() > 0;
     }
 
     /**
@@ -535,7 +522,7 @@ public class PlayerController {
         }
 
         // Remove resources if not first round
-        if (!isFirstRound()) {
+        if (playerObjectiveProperty.getValue() != PlayerObjective.PLACE_ROAD) {
             player.removeResources(Config.ROAD_BUILDING_COST);
         }
 
