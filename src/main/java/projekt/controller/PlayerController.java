@@ -7,13 +7,7 @@ import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 import projekt.Config;
 import projekt.controller.actions.IllegalActionException;
 import projekt.controller.actions.PlayerAction;
-import projekt.model.DevelopmentCardType;
-import projekt.model.Intersection;
-import projekt.model.Player;
-import projekt.model.PlayerState;
-import projekt.model.ResourceType;
-import projekt.model.TilePosition;
-import projekt.model.TradePayload;
+import projekt.model.*;
 import projekt.model.buildings.Edge;
 import projekt.model.buildings.Port;
 import projekt.model.buildings.Settlement;
@@ -147,8 +141,8 @@ public class PlayerController {
     private void updatePlayerState() {
         playerStateProperty
             .setValue(new PlayerState(getBuildableVillageIntersections(), getUpgradeableVillageIntersections(),
-                                      getBuildableRoadEdges(), getPlayersToStealFrom(), getPlayerTradingPayload(),
-                                      getCardsToSelect(), getChangedResources()
+                getBuildableRoadEdges(), getPlayersToStealFrom(), getPlayerTradingPayload(),
+                getCardsToSelect(), getChangedResources()
             ));
     }
 
@@ -216,7 +210,7 @@ public class PlayerController {
      * @throws IllegalActionException if the selected resources are invalid
      */
     public void processSelectedResources(final Map<ResourceType, Integer> selectedResources)
-    throws IllegalActionException {
+        throws IllegalActionException {
         if (selectedResources.values().stream().mapToInt(Integer::intValue).sum() != getCardsToSelect()) {
             throw new IllegalActionException("Wrong amount of cards selected");
         }
@@ -284,7 +278,7 @@ public class PlayerController {
 
             if (!playerObjectiveProperty.getValue().allowedActions.contains(action.getClass())) {
                 throw new IllegalActionException(String.format("Illegal Action %s performed. Allowed Actions: %s",
-                                                               action, playerObjectiveProperty.getValue().getAllowedActions()
+                    action, playerObjectiveProperty.getValue().getAllowedActions()
                 ));
             }
             action.execute(this);
@@ -335,8 +329,8 @@ public class PlayerController {
      */
     @StudentImplementationRequired("H2.5")
     public boolean canBuildVillage() {
-        // TODO: H2.5
-        return org.tudalgo.algoutils.student.Student.crash("H2.5 - Remove if implemented");
+        return (playerObjectiveProperty.getValue() == PlayerObjective.PLACE_VILLAGE || player.hasResources(Config.SETTLEMENT_BUILDING_COST.get(Settlement.Type.VILLAGE)))
+                && player.getRemainingVillages() > 0;
     }
 
     /**
@@ -351,8 +345,20 @@ public class PlayerController {
      */
     @StudentImplementationRequired("H2.5")
     public void buildVillage(final Intersection intersection) throws IllegalActionException {
-        // TODO: H2.5
-        org.tudalgo.algoutils.student.Student.crash("H2.5 - Remove if implemented");
+        if (!canBuildVillage()) {
+            throw new IllegalActionException("Cannot build village");
+        }
+
+        if (intersection.hasSettlement()) {
+            throw new IllegalActionException("Intersection already has a settlement");
+        }
+
+        if (!intersection.placeVillage(player, isFirstRound()))
+            throw new IllegalActionException("Cannot build village");
+
+        if (playerObjectiveProperty.getValue() != PlayerObjective.PLACE_VILLAGE) {
+            player.removeResources(Config.SETTLEMENT_BUILDING_COST.get(Settlement.Type.VILLAGE));
+        }
     }
 
     /**
@@ -394,8 +400,26 @@ public class PlayerController {
      */
     @StudentImplementationRequired("H2.6")
     public void upgradeVillage(final Intersection intersection) throws IllegalActionException {
-        // TODO: H2.6
-        org.tudalgo.algoutils.student.Student.crash("H2.6 - Remove if implemented");
+
+        if(intersection.getSettlement() == null) {
+            throw new IllegalActionException("No settlement at intersection");
+        }
+
+        if(intersection.getSettlement().type() != Settlement.Type.VILLAGE) {
+            throw new IllegalActionException("Intersection does not have a village");
+        }
+
+        if(intersection.getSettlement().owner() != player) {
+            throw new IllegalActionException("Intersection does not belong to player");
+        }
+
+        if (!canUpgradeVillage()) {
+            throw new IllegalActionException("Cannot upgrade village");
+        }
+
+        player.removeResources(Config.SETTLEMENT_BUILDING_COST.get(Settlement.Type.CITY));
+        intersection.upgradeSettlement(this.player);
+
     }
 
     /**
@@ -435,8 +459,8 @@ public class PlayerController {
      */
     @StudentImplementationRequired("H2.5")
     public boolean canBuildRoad() {
-        // TODO: H2.5
-        return org.tudalgo.algoutils.student.Student.crash("H2.5 - Remove if implemented");
+        return (playerObjectiveProperty.getValue() == PlayerObjective.PLACE_ROAD || player.hasResources(Config.ROAD_BUILDING_COST))
+            && player.getRemainingRoads() > 0;
     }
 
     /**
@@ -448,7 +472,7 @@ public class PlayerController {
      * @see #buildRoad(TilePosition, TilePosition)
      */
     public void buildRoad(final Tile tile, final TilePosition.EdgeDirection edgeDirection)
-    throws IllegalActionException {
+        throws IllegalActionException {
         buildRoad(tile.getPosition(), TilePosition.neighbour(tile.getPosition(), edgeDirection));
     }
 
@@ -465,8 +489,46 @@ public class PlayerController {
      */
     @StudentImplementationRequired("H2.5")
     public void buildRoad(final TilePosition position0, final TilePosition position1) throws IllegalActionException {
-        // TODO: H2.5
-        org.tudalgo.algoutils.student.Student.crash("H2.5 - Remove if implemented");
+        if (!canBuildRoad()) {
+            throw new IllegalActionException("Cannot build road");
+        }
+
+        GameState gameState = gameController.getState();
+        HexGrid grid = gameState.getGrid();
+
+        Edge edge = grid.getEdge(position0, position1);
+
+        if (edge == null) {
+            throw new IllegalActionException("Edge does not exist");
+        }
+
+        if(isFirstRound()) {
+            // First round: check settlement connection
+            if(edge.getIntersections().stream().noneMatch(intersection -> intersection.playerHasSettlement(player))) {
+                throw new IllegalActionException("No settlement at edge");
+            }
+        }
+
+        // Check road connection (not first round)
+        else if(edge.getConnectedRoads(player).isEmpty()) {
+            throw new IllegalActionException("Edge is not connected to player's buildings");
+        }
+
+        // Check if road connects to another player's settlements
+        if (edge.getIntersections().stream().anyMatch(intersection -> intersection.getSettlement() != null && intersection.getSettlement().owner() != player)) {
+            throw new IllegalActionException("Cannot build road to another player's settlement");
+        }
+
+        if (edge.getRoadOwner() != null) {
+            throw new IllegalActionException("Cannot build road on existing road");
+        }
+
+        // Remove resources if not first round
+        if (playerObjectiveProperty.getValue() != PlayerObjective.PLACE_ROAD) {
+            player.removeResources(Config.ROAD_BUILDING_COST);
+        }
+
+        edge.getRoadOwnerProperty().setValue(player);
     }
 
     // Development card methods
@@ -561,9 +623,22 @@ public class PlayerController {
      */
     @StudentImplementationRequired("H2.3")
     public void tradeWithBank(final ResourceType offerType, final int offerAmount, final ResourceType request)
-    throws IllegalActionException {
-        // TODO: H2.3
-        org.tudalgo.algoutils.student.Student.crash("H2.3 - Remove if implemented");
+        throws IllegalActionException {
+
+        int tradeRatio = player.getTradeRatio(offerType);
+
+        if (offerAmount % tradeRatio != 0) {
+            throw new IllegalActionException("Offer amount is not a multiple of the trade ratio");
+        }
+
+
+        if (!player.hasResources(Map.of(offerType, offerAmount))) {
+            throw new IllegalActionException("Player does not have the offered resources");
+        }
+
+        int receivedAmount = offerAmount / tradeRatio;
+        player.removeResource(offerType, offerAmount);
+        player.addResource(request, receivedAmount);
     }
 
     /**
@@ -641,8 +716,36 @@ public class PlayerController {
      */
     @StudentImplementationRequired("H2.3")
     public void acceptTradeOffer(final boolean accepted) throws IllegalActionException {
-        // TODO: H2.3
-        org.tudalgo.algoutils.student.Student.crash("H2.3 - Remove if implemented");
+
+        if (tradingPlayer == null || playerTradingOffer == null || playerTradingRequest == null) {
+            throw new IllegalActionException("No trade offer to accept");
+        }
+
+        if (!accepted) {
+            setPlayerObjective(PlayerObjective.IDLE);
+            return;
+        }
+
+        // We need to check whether the players have the required resources
+
+        if (!player.hasResources(playerTradingRequest)) {
+            throw new IllegalActionException("Player does not have the requested resources");
+        } else if (!tradingPlayer.hasResources(playerTradingOffer)) {
+            throw new IllegalActionException("Other player does not have the offered resources");
+        }
+
+        //if (player.equals(tradingPlayer)) {
+        //    throw new IllegalActionException("Player cannot trade with themself");
+        //}
+
+        // Trade can be executed
+
+        player.removeResources(playerTradingRequest);
+        player.addResources(playerTradingOffer);
+        tradingPlayer.removeResources(playerTradingOffer);
+        tradingPlayer.addResources(playerTradingRequest);
+
+        setPlayerObjective(PlayerObjective.IDLE);
     }
 
     // Robber methods
@@ -674,7 +777,7 @@ public class PlayerController {
      *                                resource
      */
     public void selectPlayerAndResourceToSteal(final Player playerToStealFrom, final ResourceType resourceToSteal)
-    throws IllegalActionException {
+        throws IllegalActionException {
         if (!playerToStealFrom.removeResource(resourceToSteal, 1)) {
             throw new IllegalActionException("Player does not have the selected resource");
         }
@@ -698,8 +801,16 @@ public class PlayerController {
      * @return all players that are next to the robber and not the current player.
      */
     public List<Player> getPlayersToStealFrom() {
-        return gameController.getState().getGrid().getTileAt(gameController.getState().getGrid().getRobberPosition())
-            .getIntersections().stream()
+        return gameController.getState().
+            getGrid()
+            .getTileAt(
+                gameController
+                    .getState()
+                    .getGrid()
+                    .getRobberPosition()
+            )
+            .getIntersections()
+            .stream()
             .filter(Intersection::hasSettlement)
             .map(i -> i.getSettlement().owner())
             .filter(Predicate.not(player::equals))

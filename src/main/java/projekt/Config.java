@@ -33,6 +33,8 @@ import static java.lang.Math.abs;
  */
 public final class Config {
 
+    public static final int RESOURCES_ALLOWED_NO_DROP = 7;
+
     // Properties and global stuff
 
     /**

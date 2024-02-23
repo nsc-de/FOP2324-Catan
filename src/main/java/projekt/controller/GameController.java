@@ -7,11 +7,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 import projekt.Config;
-import projekt.model.DevelopmentCardType;
-import projekt.model.GameState;
-import projekt.model.HexGridImpl;
-import projekt.model.Player;
-import projekt.model.ResourceType;
+import projekt.controller.actions.AcceptTradeAction;
+import projekt.controller.actions.EndTurnAction;
+import projekt.controller.actions.PlayerAction;
+import projekt.model.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -27,7 +27,7 @@ import java.util.stream.IntStream;
  * The GameController class represents the controller for the game logic.
  * It manages the game state, player controllers, dice rolling and the overall
  * progression of the game.
- * It tells the players controllers what to do and when to do it.
+ * It tells the player-controllers what to do and when to do it.
  */
 public class GameController {
 
@@ -286,8 +286,11 @@ public class GameController {
      */
     @StudentImplementationRequired("H2.1")
     private void regularTurn() {
-        // TODO: H2.1
-        org.tudalgo.algoutils.student.Student.crash("H2.1 - Remove if implemented");
+        PlayerAction playerAction;
+        do {
+            playerAction = getActivePlayerController().waitForNextAction(PlayerObjective.REGULAR_TURN);
+        }
+        while (!(playerAction instanceof EndTurnAction));
     }
 
     /**
@@ -297,8 +300,15 @@ public class GameController {
      */
     @StudentImplementationRequired("H2.1")
     private void firstRound() {
-        // TODO: H2.1
-        org.tudalgo.algoutils.student.Student.crash("H2.1 - Remove if implemented");
+        // Alle Spieler platzieren 2 Dörfer und 2 Straßen
+        for (PlayerController playerController: playerControllers.values()) {
+            withActivePlayer(playerController, () -> {
+                for (int i = 0; i < 2; i++) {
+                    playerController.waitForNextAction(PlayerObjective.PLACE_VILLAGE);
+                    playerController.waitForNextAction(PlayerObjective.PLACE_ROAD);
+                }
+            });
+        }
     }
 
     /**
@@ -314,8 +324,24 @@ public class GameController {
         final Player offeringPlayer, final Map<ResourceType, Integer> offer,
         final Map<ResourceType, Integer> request
     ) {
-        // TODO: H2.3
-        org.tudalgo.algoutils.student.Student.crash("H2.3 - Remove if implemented");
+        for(PlayerController playerController : playerControllers.values()) {
+
+            if (playerController.getPlayer() == offeringPlayer) continue;
+            AtomicBoolean tradeAccepted = new AtomicBoolean(false);
+
+            withActivePlayer(playerController, () -> {
+                playerController.setPlayerTradeOffer(offeringPlayer, offer, request);
+                PlayerAction action = playerController.waitForNextAction(PlayerObjective.ACCEPT_TRADE);
+                playerController.resetPlayerTradeOffer();
+
+                if(action instanceof AcceptTradeAction && ((AcceptTradeAction) action).accepted())
+                    tradeAccepted.set(true);
+
+            });
+
+            if (tradeAccepted.get()) break;
+        }
+        setActivePlayerControllerProperty(offeringPlayer);
     }
 
     /**
@@ -327,8 +353,18 @@ public class GameController {
      */
     @StudentImplementationRequired("H2.1")
     private void diceRollSeven() {
-        // TODO: H2.1
-        org.tudalgo.algoutils.student.Student.crash("H2.1 - Remove if implemented");
+        PlayerController currentPC = getActivePlayerController();
+        for (PlayerController playerController: playerControllers.values()) {
+            if (playerController.getPlayer().getResourceSum() > Config.RESOURCES_ALLOWED_NO_DROP) {
+                withActivePlayer(playerController, () -> {
+                    playerController.setCardsToSelect((int) Math.floor((double) playerController.getPlayer().getResourceSum() / 2));
+                    playerController.waitForNextAction(PlayerObjective.DROP_CARDS);
+                });
+            }
+        }
+        setActivePlayerControllerProperty(currentPC.getPlayer());
+        currentPC.waitForNextAction(PlayerObjective.SELECT_ROBBER_TILE);
+        currentPC.waitForNextAction(PlayerObjective.SELECT_CARD_TO_STEAL);
     }
 
     /**
@@ -338,7 +374,22 @@ public class GameController {
      */
     @StudentImplementationRequired("H2.2")
     public void distributeResources(final int diceRoll) {
-        // TODO: H2.2
-        org.tudalgo.algoutils.student.Student.crash("H2.2 - Remove if implemented");
+        getState()
+            .getGrid()
+            .getTiles()
+            .values()
+            .stream()
+            .filter(tile -> tile.getRollNumber() == diceRoll)
+            .forEach(tile -> {
+                tile.getIntersections().forEach(intersection -> {
+                    if (intersection.hasSettlement())
+                        intersection.getSettlement()
+                            .owner()
+                            .addResource(
+                                tile.getType().resourceType,
+                                intersection.getSettlement().type().resourceAmount
+                            );
+                });
+            });
     }
 }
