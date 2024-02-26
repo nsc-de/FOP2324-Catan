@@ -1,13 +1,23 @@
 package projekt.view.gameControls;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Slider;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 import projekt.model.Player;
 import projekt.model.ResourceType;
+import projekt.view.ResourceCardPane;
 
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -42,10 +52,71 @@ public class SelectResourcesDialog extends Dialog<Map<ResourceType, Integer>> {
 
     @StudentImplementationRequired("H3.3")
     private Region init(
-        final int amountToSelect, final Player player,
+        final int amountToSelect,
+        final Player player,
         Map<ResourceType, Integer> resourcesToSelectFrom, final boolean dropCards
     ) {
-        // TODO: H3.3
-        return org.tudalgo.algoutils.student.Student.crash("H3.3 - Remove if implemented");
+
+        // Initial Setup
+        GridPane gridPane = new GridPane();
+
+        VBox vBox = new VBox();
+        gridPane.getChildren().add(vBox);
+
+        vBox.getChildren().add(new Text("Select resources"));
+        if (dropCards)
+            vBox.getChildren().add(new Text(String.format("These resources will be dropped %c", 0xF01F8)));
+
+        HBox hBox = new HBox();
+        vBox.getChildren().add(hBox);
+
+        Map<ResourceType, Integer> map = new HashMap<>();
+
+        if (resourcesToSelectFrom == null) resourcesToSelectFrom = player.getResources();
+        Text selected = new Text(selectedCounter(0, amountToSelect));
+
+        resourcesToSelectFrom
+            .entrySet()
+            .stream()
+            .sorted(Map.Entry.comparingByKey())
+            .forEach(((it) -> {
+
+                ResourceType resourceType = it.getKey();
+                int amount = it.getValue();
+
+                VBox localvBox = new VBox();
+                hBox.getChildren().add(localvBox);
+                localvBox.getChildren().add(new ResourceCardPane(resourceType, amount));
+
+                Slider slider = new Slider(0, amount, 0);
+                slider.setMajorTickUnit(2.0);
+                slider.setBlockIncrement(1.0);
+                slider.setShowTickLabels(true);
+                slider.setShowTickMarks(true);
+                Text sliderText = new Text("0");
+                slider.valueProperty().addListener(new ChangeListener<Number>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                        slider.setValue(newValue.intValue());
+                        map.put(resourceType, newValue.intValue());
+                        sliderText.setText(String.valueOf(newValue.intValue()));
+                        int mapSum = map.values().stream().mapToInt(Integer::intValue).sum();
+                        selected.setText(selectedCounter(mapSum, amountToSelect));
+                        getDialogPane().lookupButton(ButtonType.OK).setDisable(mapSum != amountToSelect);
+                    }
+                });
+                localvBox.getChildren().add(slider);
+                localvBox.getChildren().add(sliderText);
+            }));
+
+        vBox.getChildren().add(selected);
+
+        getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
+        setResultConverter(button -> map);
+        return gridPane;
+    }
+
+    private String selectedCounter(int selected, int amountToSelect) {
+        return String.format("Selected: %d / %d", selected, amountToSelect);
     }
 }
