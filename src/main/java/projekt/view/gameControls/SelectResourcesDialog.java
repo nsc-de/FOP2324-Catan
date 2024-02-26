@@ -1,7 +1,5 @@
 package projekt.view.gameControls;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
@@ -16,7 +14,6 @@ import projekt.model.Player;
 import projekt.model.ResourceType;
 import projekt.view.ResourceCardPane;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,7 +62,7 @@ public class SelectResourcesDialog extends Dialog<Map<ResourceType, Integer>> {
 
         vBox.getChildren().add(new Text("Select resources"));
         if (dropCards)
-            vBox.getChildren().add(new Text(String.format("These resources will be dropped %c", 0xF01F8)));
+            vBox.getChildren().add(new Text("These resources will be dropped!"));
 
         HBox hBox = new HBox();
         vBox.getChildren().add(hBox);
@@ -94,16 +91,13 @@ public class SelectResourcesDialog extends Dialog<Map<ResourceType, Integer>> {
                 slider.setShowTickLabels(true);
                 slider.setShowTickMarks(true);
                 Text sliderText = new Text("0");
-                slider.valueProperty().addListener(new ChangeListener<Number>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                        slider.setValue(newValue.intValue());
-                        map.put(resourceType, newValue.intValue());
-                        sliderText.setText(String.valueOf(newValue.intValue()));
-                        int mapSum = map.values().stream().mapToInt(Integer::intValue).sum();
-                        selected.setText(selectedCounter(mapSum, amountToSelect));
-                        getDialogPane().lookupButton(ButtonType.OK).setDisable(mapSum != amountToSelect);
-                    }
+                slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+                    slider.setValue(newValue.intValue());
+                    map.put(resourceType, newValue.intValue());
+                    sliderText.setText(String.valueOf(newValue.intValue()));
+                    int mapSum = map.values().stream().mapToInt(Integer::intValue).sum();
+                    selected.setText(selectedCounter(mapSum, amountToSelect));
+                    getDialogPane().lookupButton(ButtonType.OK).setDisable(mapSum != amountToSelect);
                 });
                 localvBox.getChildren().add(slider);
                 localvBox.getChildren().add(sliderText);
