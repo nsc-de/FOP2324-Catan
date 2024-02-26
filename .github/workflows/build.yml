@@ -43,7 +43,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Build 🔨
-        run: ./gradlew mainBuildSubmission
+        run: ./gradlew mainBuildSubmission build -x graderPublicRun
 
       - name: Find JAR file
         run: |
@@ -72,6 +72,7 @@ jobs:
         with:
           artifacts: |
             build/libs/*-submission.jar
+            build/distributions/*
           allowUpdates: false
           makeLatest: true
           name: ${{ steps.tag_version.outputs.new_tag }} - ${{ github.event.head_commit.message }} (${{ github.sha }})
