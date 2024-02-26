@@ -1,18 +1,6 @@
 package projekt.controller;
 
-import projekt.controller.actions.AcceptTradeAction;
-import projekt.controller.actions.BuildRoadAction;
-import projekt.controller.actions.BuildVillageAction;
-import projekt.controller.actions.BuyDevelopmentCardAction;
-import projekt.controller.actions.EndTurnAction;
-import projekt.controller.actions.PlayDevelopmentCardAction;
-import projekt.controller.actions.PlayerAction;
-import projekt.controller.actions.RollDiceAction;
-import projekt.controller.actions.SelectCardsAction;
-import projekt.controller.actions.SelectRobberTileAction;
-import projekt.controller.actions.StealCardAction;
-import projekt.controller.actions.TradeAction;
-import projekt.controller.actions.UpgradeVillageAction;
+import projekt.controller.actions.*;
 
 import java.util.Set;
 

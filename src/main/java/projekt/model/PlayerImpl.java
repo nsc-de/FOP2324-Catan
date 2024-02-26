@@ -14,9 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static projekt.Config.MAX_CITIES;
-import static projekt.Config.MAX_ROADS;
-import static projekt.Config.MAX_VILLAGES;
+import static projekt.Config.*;
 
 /**
  * Default implementation of {@link Player}.

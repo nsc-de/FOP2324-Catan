@@ -16,12 +16,7 @@ import projekt.controller.actions.*;
 import projekt.model.*;
 import projekt.model.buildings.Edge;
 import projekt.model.tiles.Tile;
-import projekt.view.gameControls.AcceptTradeDialog;
-import projekt.view.gameControls.PlayerActionsBuilder;
-import projekt.view.gameControls.SelectCardToStealDialog;
-import projekt.view.gameControls.SelectResourcesDialog;
-import projekt.view.gameControls.TradeDialog;
-import projekt.view.gameControls.UseDevelopmentCardDialog;
+import projekt.view.gameControls.*;
 
 import java.util.Map;
 import java.util.Optional;
