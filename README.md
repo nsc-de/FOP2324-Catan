@@ -15,6 +15,6 @@ Beachten Sie die Hinweise zum Herunterladen, Importieren, Bearbeitern, Exportier
 
 Download Application
 
-[.zip](https://github.com/nsc-de/FOP2324-Catan/releases/latest/download/FOP-2324-Projekt-Student.zip)
+[[.zip](https://github.com/nsc-de/FOP2324-Catan/releases/latest/download/FOP-2324-Projekt-Student.zip)]
 ·
-[.tar](https://github.com/nsc-de/FOP2324-Catan/releases/latest/download/FOP-2324-Projekt-Student.zip)
+[[.tar](https://github.com/nsc-de/FOP2324-Catan/releases/latest/download/FOP-2324-Projekt-Student.zip)]
