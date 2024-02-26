@@ -3,6 +3,7 @@ import org.sourcegrade.jagr.gradle.task.grader.GraderRunTask
 plugins {
     alias(libs.plugins.algomate)
     alias(libs.plugins.javafxplugin)
+    application
 }
 
 exercise {
@@ -63,4 +64,8 @@ tasks {
     withType<Javadoc> {
         options.encoding = "UTF-8"
     }
+}
+
+application {
+    mainClass.set("projekt.Main")
 }
