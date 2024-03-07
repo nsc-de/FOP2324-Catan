@@ -12,3 +12,8 @@ Beachten Sie die Hinweise zum Herunterladen, Importieren, Bearbeitern, Exportier
 [Get Solution (When available)](https://github.com/FOP-2324/FOP-2324-Projekt-Root)
 ·
 [See Javadoc](https://nscde.com/FOP2324-Catan/)
+
+[Download Application](https://github.com/nsc-de/FOP2324-Catan/releases/latest/):
+[[.zip](https://github.com/nsc-de/FOP2324-Catan/releases/latest/download/FOP-2324-Projekt-Student.zip)]
+·
+[[.tar](https://github.com/nsc-de/FOP2324-Catan/releases/latest/download/FOP-2324-Projekt-Student.zip)]
