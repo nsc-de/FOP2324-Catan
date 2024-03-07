@@ -11,7 +11,6 @@ import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 import projekt.model.PlayerImpl;
 import projekt.model.PlayerImpl.Builder;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 /**

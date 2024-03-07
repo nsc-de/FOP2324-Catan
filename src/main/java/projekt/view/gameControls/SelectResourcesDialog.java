@@ -1,12 +1,13 @@
 package projekt.view.gameControls;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Slider;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.tudalgo.algoutils.student.annotation.StudentImplementationRequired;
 import projekt.model.Player;
@@ -15,7 +16,6 @@ import projekt.view.ResourceCardPane;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 
 /**
  * A dialog to prompt the user to select a number of resources.

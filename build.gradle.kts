@@ -1,5 +1,3 @@
-import org.sourcegrade.jagr.gradle.task.grader.GraderRunTask
-
 plugins {
     alias(libs.plugins.algomate)
     alias(libs.plugins.jagr)
