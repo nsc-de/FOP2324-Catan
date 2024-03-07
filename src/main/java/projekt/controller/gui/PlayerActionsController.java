@@ -112,11 +112,6 @@ public class PlayerActionsController implements Controller {
      */
     @StudentImplementationRequired("H3.2")
     private void updateUIBasedOnObjective(final PlayerObjective objective) {
-
-        removeAllHighlights();
-        drawEdges();
-        drawIntersections();
-        getHexGridController().drawTiles();
         removeAllHighlights();
         drawEdges();
         drawIntersections();
@@ -135,21 +130,16 @@ public class PlayerActionsController implements Controller {
 
 
         // Buy / Upgrade actions
-        if(actions.contains(BuildRoadAction.class))
-            updateBuildRoadButtonState();
+        updateBuildRoadButtonState();
 
-        if(actions.contains(BuildVillageAction.class))
-            updateBuildVillageButtonState();
+        updateBuildVillageButtonState();
 
-        if(actions.contains(UpgradeVillageAction.class))
-            updateUpgradeVillageButtonState();
+        updateUpgradeVillageButtonState();
 
         // Development Card
-        if(actions.contains(BuyDevelopmentCardAction.class))
-            updateBuyDevelopmentCardButtonState();
+        updateBuyDevelopmentCardButtonState();
 
-        if(actions.contains(PlayDevelopmentCardAction.class))
-            updateUseDevelopmentCardButtonState();
+        updateUseDevelopmentCardButtonState();
 
         // End Turn
         if (actions.contains(EndTurnAction.class))
@@ -176,7 +166,6 @@ public class PlayerActionsController implements Controller {
         // Trade
         if (actions.contains(TradeAction.class)) builder.enableTradeButton();
         else builder.disableTradeButton();
-
     }
 
     /**
@@ -321,13 +310,12 @@ public class PlayerActionsController implements Controller {
      */
     @StudentImplementationRequired("H3.1")
     private void updateBuildVillageButtonState() {
-
-        if(getPlayerController().canBuildVillage()) {
+        if(getPlayerController().canBuildVillage()
+            && !getPlayerState().buildableVillageIntersections().isEmpty()) {
             builder.enableBuildVillageButton();
         } else {
             builder.disableBuildVillageButton();
         }
-
     }
 
     /**
@@ -361,13 +349,12 @@ public class PlayerActionsController implements Controller {
      */
     @StudentImplementationRequired("H3.1")
     private void updateUpgradeVillageButtonState() {
-
-        if(getPlayerController().canUpgradeVillage()) {
+        if(getPlayerController().canUpgradeVillage()
+            && !getPlayerState().upgradableVillageIntersections().isEmpty()) {
             builder.enableUpgradeVillageButton();
         } else {
             builder.disableUpgradeVillageButton();
         }
-
     }
 
     /**
@@ -402,12 +389,12 @@ public class PlayerActionsController implements Controller {
     @StudentImplementationRequired("H3.1")
     private void updateBuildRoadButtonState() {
 
-        if(getPlayerController().canBuildRoad()) {
+        if(getPlayerController().canBuildRoad()
+            && !getPlayerState().buildableRoadEdges().isEmpty()) {
             builder.enableBuildRoadButton();
         } else {
             builder.disableBuildRoadButton();
-        }
-
+        }  
     }
 
     /**
