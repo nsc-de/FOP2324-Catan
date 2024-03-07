@@ -6,7 +6,7 @@ import projekt.model.HexGrid;
 import projekt.model.Intersection;
 import projekt.model.Player;
 import projekt.model.TilePosition;
-import projekt.model.TilePosition.*;
+import projekt.model.TilePosition.EdgeDirection;
 import projekt.model.tiles.Tile;
 
 import java.util.Set;

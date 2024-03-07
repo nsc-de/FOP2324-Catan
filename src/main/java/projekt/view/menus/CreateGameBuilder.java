@@ -3,9 +3,7 @@ package projekt.view.menus;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.tudalgo.algoutils.student.annotation.DoNotTouch;
@@ -57,7 +55,7 @@ public class CreateGameBuilder extends MenuBuilder {
                 final HBox playerListingHBox = new HBox();
                 playerListingHBox.setAlignment(Pos.CENTER);
                 final TextField playerNameTextField = new TextField(playerBuilder.nameOrDefault());
-                playerNameTextField.setOnKeyPressed(e -> {
+                playerNameTextField.setOnKeyReleased(e -> {
                     final String newName = playerNameTextField.getText();
                     if (newName.isBlank()) {
                         playerBuilder.name(null);
@@ -70,7 +68,14 @@ public class CreateGameBuilder extends MenuBuilder {
                 playerListingHBox.getChildren().addAll(
                     playerNameTextField
                 );
-                playerListVBox.getChildren().add(playerListingHBox);
+
+                playerListVBox.getChildren().addAll(
+                    playerListingHBox,
+                    createRemovePlayerButton(playerBuilder.getId()),
+                    createPlayerColorPicker(playerBuilder),
+                    createBotOrPlayerSelector(playerBuilder)
+                );
+                playerListVBox.setAlignment(Pos.CENTER);
             }
         });
 
@@ -84,6 +89,7 @@ public class CreateGameBuilder extends MenuBuilder {
 
         mainBox.getChildren().addAll(
             playerListVBox,
+            createAddPlayerButton(),
             startGameButton,
             startGameErrorLabel
         );
@@ -99,8 +105,9 @@ public class CreateGameBuilder extends MenuBuilder {
      */
     @StudentImplementationRequired("H3.4")
     private Node createAddPlayerButton() {
-        // TODO: H3.4
-        return org.tudalgo.algoutils.student.Student.crash("H3.4 - Remove if implemented");
+        Button addPlayerButton = new Button("Add player");
+        addPlayerButton.setOnAction(actionEvent -> observablePlayers.add(nextPlayerBuilder()));
+        return addPlayerButton;
     }
 
     /**
@@ -113,8 +120,22 @@ public class CreateGameBuilder extends MenuBuilder {
      */
     @StudentImplementationRequired("H3.4")
     private Node createPlayerColorPicker(final Builder playerBuilder) {
-        // TODO: H3.4
-        return org.tudalgo.algoutils.student.Student.crash("H3.4 - Remove if implemented");
+        ColorPicker colorPicker = new ColorPicker(playerBuilder.getColor());
+        colorPicker.setOnAction(actionEvent -> {
+            if (
+                observablePlayers.stream()
+                    .filter(builder -> builder != playerBuilder)
+                    .noneMatch(pBuilder -> pBuilder.getColor() == colorPicker.getValue())
+            ) {
+                playerBuilder.color(colorPicker.getValue());
+                return;
+            }
+
+            colorPicker.setValue(playerBuilder.getColor());
+            new Alert(Alert.AlertType.ERROR, "This color is already in use by another player.").showAndWait();
+        });
+        return colorPicker;
+
     }
 
     /**
@@ -125,8 +146,10 @@ public class CreateGameBuilder extends MenuBuilder {
      */
     @StudentImplementationRequired("H3.4")
     private Node createBotOrPlayerSelector(final Builder playerBuilder) {
-        // TODO: H3.4
-        return org.tudalgo.algoutils.student.Student.crash("H3.4 - Remove if implemented");
+        CheckBox checkBox = new CheckBox("Bot");
+        checkBox.setSelected(playerBuilder.isAi());
+        checkBox.setOnAction(actionEvent -> playerBuilder.ai(checkBox.isSelected()));
+        return checkBox;
     }
 
     /**
@@ -137,8 +160,9 @@ public class CreateGameBuilder extends MenuBuilder {
      */
     @StudentImplementationRequired("H3.4")
     private Button createRemovePlayerButton(final int id) {
-        // TODO: H3.4
-        return org.tudalgo.algoutils.student.Student.crash("H3.4 - Remove if implemented");
+        Button removePlayerButton = new Button("Remove player");
+        removePlayerButton.setOnAction(actionEvent -> removePlayer(id));
+        return removePlayerButton;
     }
 
     /**
@@ -149,8 +173,17 @@ public class CreateGameBuilder extends MenuBuilder {
      */
     @StudentImplementationRequired("H3.4")
     private void removePlayer(final int id) {
-        // TODO: H3.4
-        org.tudalgo.algoutils.student.Student.crash("H3.4 - Remove if implemented");
+        // All ids that are > id need to be decremented by 1
+        int index = -1;
+
+        for (int i = 0; i < this.observablePlayers.size(); i++) {
+            final PlayerImpl.Builder player = this.observablePlayers.get(i);
+            final int currentId = player.getId();
+            if (currentId == id) index = i;
+            else if (currentId > id) player.id(currentId - 1);
+        }
+
+        if (index != -1) this.observablePlayers.remove(index);
     }
 
     /**
