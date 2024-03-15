@@ -321,16 +321,16 @@ public class GameController {
     ) {
         for(PlayerController playerController : playerControllers.values()) {
 
-            if (playerController.getPlayer() == offeringPlayer) continue;
+            if (!playerController.canAcceptTradeOffer(offeringPlayer, request)) continue;
             AtomicBoolean tradeAccepted = new AtomicBoolean(false);
 
             withActivePlayer(playerController, () -> {
-                playerController.setPlayerTradeOffer(offeringPlayer, offer, request);
-                PlayerAction action = playerController.waitForNextAction(PlayerObjective.ACCEPT_TRADE);
-                playerController.resetPlayerTradeOffer();
+                    playerController.setPlayerTradeOffer(offeringPlayer, offer, request);
+                    PlayerAction action = playerController.waitForNextAction(PlayerObjective.ACCEPT_TRADE);
+                    playerController.resetPlayerTradeOffer();
 
-                if(action instanceof AcceptTradeAction && ((AcceptTradeAction) action).accepted())
-                    tradeAccepted.set(true);
+                    if(action instanceof AcceptTradeAction && ((AcceptTradeAction) action).accepted())
+                        tradeAccepted.set(true);
 
             });
 
