@@ -310,7 +310,8 @@ public class PlayerActionsController implements Controller {
      */
     @StudentImplementationRequired("H3.1")
     private void updateBuildVillageButtonState() {
-        if(getPlayerController().canBuildVillage()
+        if (getPlayerObjective().getAllowedActions().contains(BuildVillageAction.class)
+        && getPlayerController().canBuildVillage()
             && !getPlayerState().buildableVillageIntersections().isEmpty()) {
             builder.enableBuildVillageButton();
         } else {
@@ -349,7 +350,8 @@ public class PlayerActionsController implements Controller {
      */
     @StudentImplementationRequired("H3.1")
     private void updateUpgradeVillageButtonState() {
-        if(getPlayerController().canUpgradeVillage()
+        if (getPlayerObjective().getAllowedActions().contains(UpgradeVillageAction.class)
+        && getPlayerController().canUpgradeVillage()
             && !getPlayerState().upgradableVillageIntersections().isEmpty()) {
             builder.enableUpgradeVillageButton();
         } else {
@@ -388,13 +390,13 @@ public class PlayerActionsController implements Controller {
      */
     @StudentImplementationRequired("H3.1")
     private void updateBuildRoadButtonState() {
-
-        if(getPlayerController().canBuildRoad()
+        if (getPlayerObjective().getAllowedActions().contains(BuildRoadAction.class)
+        && getPlayerController().canBuildRoad()
             && !getPlayerState().buildableRoadEdges().isEmpty()) {
             builder.enableBuildRoadButton();
         } else {
             builder.disableBuildRoadButton();
-        }  
+        }
     }
 
     /**
