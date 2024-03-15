@@ -105,6 +105,8 @@ public class SelectResourcesDialog extends Dialog<Map<ResourceType, Integer>> {
 
         vBox.getChildren().add(selected);
 
+        getDialogPane().getScene().getWindow().setOnCloseRequest((event) -> {});
+
         getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
         setResultConverter(button -> map);
         return gridPane;
