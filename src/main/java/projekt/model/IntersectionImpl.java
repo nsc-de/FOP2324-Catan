@@ -42,6 +42,7 @@ public class IntersectionImpl implements Intersection {
      * @param position1 the second position
      * @param position2 the third position
      */
+
     @DoNotTouch
     public IntersectionImpl(final TilePosition position0, final TilePosition position1, final TilePosition position2, final HexGrid hexGrid) {
         if (position0 == null || position1 == null || position2 == null)
